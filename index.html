@@ -11,13 +11,41 @@ function parseSheetDate(value){
   }
   m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m){const d=new Date(+m[1],+m[2]-1,+m[3]);return isNaN(d)?null:d}return null;
 }
+function getISOWeek(date){
+  const currentDate = new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    )
+  );
+
+  const dayNumber = currentDate.getUTCDay() || 7;
+
+  currentDate.setUTCDate(
+    currentDate.getUTCDate() + 4 - dayNumber
+  );
+
+  const firstDayOfYear = new Date(
+    Date.UTC(currentDate.getUTCFullYear(), 0, 1)
+  );
+
+  return Math.ceil(
+    (((currentDate - firstDayOfYear) / 86400000) + 1) / 7
+  );
+}
+
 function periodLabel(values){
-  const dates=values.map(parseSheetDate).filter(Boolean).sort((a,b)=>a-b);
-  if(!dates.length)return 'Semana: não identificada';
-  const first=dates[0],last=dates[dates.length-1];
-  const oneDay=first.toDateString()===last.toDateString();
-  if(oneDay)return `Semana: ${first.toLocaleDateString('pt-BR')}`;
-  return `Semana: ${first.toLocaleDateString('pt-BR')} a ${last.toLocaleDateString('pt-BR')}`;
+  const dates = values
+    .map(parseSheetDate)
+    .filter(Boolean)
+    .sort((a, b) => a - b);
+
+  const referenceDate = dates.length
+    ? dates[0]
+    : new Date();
+
+  return `Semana: ${getISOWeek(referenceDate)}`;
 }
 const $=x=>document.getElementById(x),norm=x=>(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(),num=x=>{let s=(x||'').replace(/R\$/g,'').replace(/\s/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(',','.');return +s||0},money=x=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(x),nfmt=x=>new Intl.NumberFormat('pt-BR',{maximumFractionDigits:3}).format(x),pct=(e,p)=>p?((e-p)/p*100):(e?NaN:0),pf=x=>Number.isNaN(x)?'Custo não planejado':`${x>0?'+':''}${x.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}%`,tm=x=>{let m=(x||'').match(/^(-)?(\d+):(\d{2})$/);return m?(m[1]?-1:1)*(+m[2]*60 + +m[3]):0},tf=x=>`${x<0?'-':''}${String(Math.floor(Math.abs(x)/60)).padStart(2,'0')}:${String(Math.abs(x)%60).padStart(2,'0')}`;
 function generate(){let ls=$('input').value.trim().split(/\r?\n/);if(ls.length<2)return $('msg').textContent='Cole o cabeçalho e os dados.';let d=ls[0].includes('\t')?'\t':';',h=ls[0].split(d).map(norm),ix=(...a)=>h.findIndex(v=>a.some(k=>v.includes(norm(k)))),I={r:ix('responsavel'),t:ix('tipo de trabalho'),pi:h.indexOf('pi'),v:ix('niveis de tensao'),s:ix('status'),c:ix('conjunto crit'),cp:ix('chi planejado'),ce:ix('chi executado'),fp:ix('comp. financ. planej'),fe:ix('comp. financ. execut'),ai:ix('atraso inicio'),af:ix('atraso fim'),di:ix('prev. inicio'),ri:ix('inicio da interrupcao'),df:ix('prev. fim'),rf:ix('termino da interrupcao')};rows=ls.slice(1).filter(Boolean).map(l=>{let c=l.split(d),g=i=>i>=0?(c[i]||'').trim():'',cp=num(g(I.cp)),ce=num(g(I.ce)),fp=num(g(I.fp)),fe=num(g(I.fe));return{r:g(I.r),t:g(I.t),pi:g(I.pi),v:g(I.v),s:g(I.s),c:g(I.c),cp,ce,cv:pct(ce,cp),fp,fe,fv:pct(fe,fp),ai:tm(g(I.ai)),af:tm(g(I.af)),dates:[g(I.di),g(I.ri),g(I.df),g(I.rf)].filter(Boolean)}});let sum=k=>rows.reduce((a,b)=>a+b[k],0),cp=sum('cp'),ce=sum('ce'),fp=sum('fp'),fe=sum('fe'),un=rows.reduce((a,b)=>a+(b.fp===0?b.fe:0),0),cr=new Set(rows.map(r=>norm(r.c)).filter(Boolean)),mx=rows.reduce((a,b)=>!a||b.af>a.af?b:a,null);$('chi').textContent=nfmt(ce);$('chis').textContent=`Planejado: ${nfmt(cp)} | Variação: ${pf(pct(ce,cp))}`;$('cf').textContent=money(fe);$('cfs').textContent=`Planejado: ${money(fp)} | Variação: ${pf(pct(fe,fp))}`;$('unp').textContent=money(un);$('unps').textContent=`${rows.filter(r=>r.fp===0&&r.fe>0).length} PI(s) sem planejamento`;$('crit').textContent=cr.size;$('delay').textContent=tf(mx.af);$('delaypi').textContent=`PI: ${mx.pi}`;$('period').textContent=periodLabel(rows.flatMap(r=>r.dates));
