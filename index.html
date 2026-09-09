@@ -656,9 +656,10 @@
             currency: "BRL",
           }).format(x),
         nfmt = (x) =>
-          new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 3 }).format(
-            x,
-          ),
+          new Intl.NumberFormat("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(x),
         pct = (e, p) => (p ? ((e - p) / p) * 100 : e ? NaN : 0),
         // Formata variações percentuais. Quando o planejado é zero, não existe base para calcular percentual.
         pf = (x) =>
@@ -865,15 +866,21 @@
         const owners = group("r", "ce").slice(0, 8),
           types = group("t", "ce").slice(0, 7),
           volt = group("v", "ce").slice(0, 5);
+        // Prioriza os casos com maior variacao percentual positiva de CHI.
+        // Registros sem CHI planejado ficam fora da classificacao.
         const topChi = [...rows]
-          .sort((a, b) => (b.ce || 0) - (a.ce || 0))
+          .filter((r) => !Number.isNaN(r.cv))
+          .sort((a, b) => b.cv - a.cv)
           .slice(0, 8);
         const topFin = [...rows]
           .sort((a, b) => (b.fe || 0) - (a.fe || 0))
           .slice(0, 8);
+        // Exibe apenas casos em que o atraso permaneceu ou aumentou ate o termino.
+        // Se o atraso de inicio foi recuperado no termino, o caso nao exige destaque.
+        // Casos sem atraso no inicio, mas com atraso no termino, sao incluidos.
         const delays = [...rows]
-          .filter((r) => r.af > 0 || r.ai > 0)
-          .sort((a, b) => Math.max(b.af, b.ai) - Math.max(a.af, a.ai))
+          .filter((r) => r.af > 0 && r.af >= Math.max(r.ai, 0))
+          .sort((a, b) => (b.af - a.af) || ((b.af - b.ai) - (a.af - a.ai)))
           .slice(0, 8);
         const dates = rows
           .flatMap((r) => r.dates)
@@ -1001,10 +1008,10 @@
                   .map((x) => `<span>${esc(x)}</span>`)
                   .join("")
               : "<span>Nenhum conjunto crítico informado</span>"
-          }</div><h3>PIs com maior CHI executado</h3>${table(["PI", "Responsável", "Tensão", "CHI plan.", "CHI exec.", "Variação"], topChi, (r) => [esc(r.pi), esc(r.r), esc(r.v), nfmt(r.cp), `<b>${nfmt(r.ce)}</b>`, `<b class="${r.cv > 0 ? "risk" : "ok"}">${Number.isNaN(r.cv) ? "Sem CHI planejado" : pf(r.cv)}</b>`])}</section>`,
+          }</div><h3>PIs com maior variação de CHI</h3>${table(["PI", "Responsável", "Tensão", "CHI plan.", "CHI exec.", "Variação"], topChi, (r) => [esc(r.pi), esc(r.r), esc(r.v), nfmt(r.cp), `<b>${nfmt(r.ce)}</b>`, `<b class="${r.cv > 0 ? "risk" : "ok"}">${Number.isNaN(r.cv) ? "Sem CHI planejado" : pf(r.cv)}</b>`])}</section>`,
         );
         slides.push(
-          `<section class="slide"><header><img src="${logo}"><div><small>ADERÊNCIA À PROGRAMAÇÃO</small><h2>Desvios de horário que exigem tratativa</h2></div><b class="header-reference"><span>${weekLabel}</span><small class="header-period">${period}</small><small>${esc(managementName)}</small></b></header>${delays.length ? table(["PI", "Responsável", "Status", "Atraso início", "Atraso término"], delays, (r) => [esc(r.pi), esc(r.r), esc(r.s), `<b class="${r.ai > 0 ? "risk" : "ok"}">${tf(r.ai)}</b>`, `<b class="${r.af > 0 ? "risk" : "ok"}">${tf(r.af)}</b>`]) : '<div class="empty">Nenhum atraso positivo foi identificado.</div>'}<div class="note">Diferenças negativas representam antecipação e não são classificadas como atraso crítico.</div></section>`,
+          `<section class="slide"><header><img src="${logo}"><div><small>ADERÊNCIA À PROGRAMAÇÃO</small><h2>Desvios de horário que exigem tratativa</h2></div><b class="header-reference"><span>${weekLabel}</span><small class="header-period">${period}</small><small>${esc(managementName)}</small></b></header>${delays.length ? table(["PI", "Responsável", "Status", "Atraso início", "Atraso término"], delays, (r) => [esc(r.pi), esc(r.r), esc(r.s), `<b class="${r.ai > 0 ? "risk" : "ok"}">${tf(r.ai)}</b>`, `<b class="${r.af > 0 ? "risk" : "ok"}">${tf(r.af)}</b>`]) : '<div class="empty">Nenhum caso apresentou atraso relevante no término.</div>'}<div class="note">Critério: são exibidos somente os casos em que o atraso no término foi igual ou superior ao atraso no início. Casos com recuperação do atraso até o término não entram na lista.</div></section>`,
         );
         const rec = [];
         if (pchi > 0)
