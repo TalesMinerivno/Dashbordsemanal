@@ -673,9 +673,18 @@
         tf = (x) =>
           `${x < 0 ? "-" : ""}${String(Math.floor(Math.abs(x) / 60)).padStart(2, "0")}:${String(Math.abs(x) % 60).padStart(2, "0")}`;
       // Funcao principal: le a planilha, mapeia colunas, calcula indicadores e gera dashboard/apresentacao.
+      function preparePastedLines(raw) {
+        raw=String(raw||"").replace(/\u00a0/g," ").replace(/<br\s*\/?>/gi,"");
+        const physical=raw.split(/\r?\n/).map(v=>v.trim()), first=physical.find(Boolean)||"";
+        if(first.includes("\t")||first.includes(";")) return physical.filter(Boolean);
+        const headers=["responsavel","tipo de trabalho","pi","niveis de tensao","status pi","conjunto crit","chi planejado","chi executado","variacao chi","comp financ planej","comp financ execut","variacao financeira","prev inicio interrup","inicio da interrupcao","atraso inicio formatado","prev fim interrup","termino da interrupcao","atraso fim formatado"];
+        const vals=physical.filter(Boolean); if(vals.length<18||!headers.every((h,i)=>norm(vals[i]).includes(h))) return vals;
+        const data=vals.slice(18), rebuilt=[vals.slice(0,18).join("\t")];
+        for(let i=0;i<data.length;){let row=data.slice(i,i+5);i+=5;const x=data[i]||"";if(/^\s*(?:R\$\s*)?-?[\d.]+(?:,\d+)?%?\s*$/.test(x))row.push("");else{row.push(x);i++}row.push(...data.slice(i,i+12));i+=12;while(row.length<18)row.push("");rebuilt.push(row.slice(0,18).join("\t"))}return rebuilt;
+      }
       function generate() {
         // Separa o texto colado em linhas.
-        let ls = $("input").value.trim().split(/\r?\n/);
+        let ls = preparePastedLines($("input").value.trim());
         if (ls.length < 2)
           return ($("msg").textContent = "Cole o cabeçalho e os dados.");
         let d = ls[0].includes("\t") ? "\t" : ";",
@@ -1133,22 +1142,47 @@ article strong{color:#14332d;font-family:'Arial Black',Arial,sans-serif;font-siz
 .slide.cover{background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important}
 .slide.cover.on{visibility:visible!important}
 
-.deck{perspective:1600px;background:#dfe8e5}
-.slide{display:block!important;visibility:hidden;opacity:0;pointer-events:none;transform:translate3d(0,0,0);will-change:transform,opacity;z-index:0}
-.slide.on{visibility:visible;pointer-events:auto;z-index:2}
-.slide.enter-right{transform:translate3d(4.5%,0,0);opacity:0}.slide.enter-left{transform:translate3d(-4.5%,0,0);opacity:0}
-.slide.enter-right.settled,.slide.enter-left.settled,.slide.on.settled{transform:translate3d(0,0,0);opacity:1;transition:transform .58s cubic-bezier(.22,.76,.24,1),opacity .40s ease}
-.slide.exit-left{visibility:visible;transform:translate3d(-3%,0,0);opacity:0;transition:transform .48s cubic-bezier(.4,0,.6,1),opacity .34s ease;z-index:1}
-.slide.exit-right{visibility:visible;transform:translate3d(3%,0,0);opacity:0;transition:transform .48s cubic-bezier(.4,0,.6,1),opacity .34s ease;z-index:1}
-.slide.on.settled header,.slide.on.settled .kgrid>*,.slide.on.settled .manager-grid>*,.slide.on.settled .compare>*,.slide.on.settled .bars,.slide.on.settled .table,.slide.on.settled .alert,.slide.on.settled .badges,.slide.on.settled .recs>*,.slide.on.settled .closing,.slide.on.settled .quality-context{animation:contentRise .52s cubic-bezier(.22,.76,.24,1) both}
-.slide.on.settled .kgrid>*:nth-child(2),.slide.on.settled .manager-grid>*:nth-child(2),.slide.on.settled .compare>*:nth-child(2),.slide.on.settled .recs>*:nth-child(2){animation-delay:.06s}
-.slide.on.settled .kgrid>*:nth-child(3),.slide.on.settled .manager-grid>*:nth-child(3),.slide.on.settled .compare>*:nth-child(3),.slide.on.settled .recs>*:nth-child(3){animation-delay:.12s}
-.slide.on.settled .kgrid>*:nth-child(n+4),.slide.on.settled .compare>*:nth-child(4),.slide.on.settled .recs>*:nth-child(n+4){animation-delay:.17s}
-.cover.on.settled .coverbody{animation:coverReveal .72s cubic-bezier(.22,.76,.24,1) both}.cover.on.settled .coverfoot{animation:fadeIn .7s .18s ease both}
-@keyframes contentRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes coverReveal{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.progress{position:fixed;z-index:8;left:0;right:0;bottom:0;height:4px;background:rgba(20,51,45,.18)}.progress i{display:block;height:100%;width:0;background:#00d4c0;transition:width .45s cubic-bezier(.22,.76,.24,1)}
-.nav .fs{width:34px;margin-left:2px;background:transparent;color:#00d4c0;border:1px solid rgba(0,212,192,.55)}
-@media(prefers-reduced-motion:reduce){.slide,.slide.on,.slide.settled,.slide.exit-left,.slide.exit-right,.slide.enter-left,.slide.enter-right{transition:none!important;animation:none!important;transform:none!important}.slide.on{opacity:1!important}.slide.on *{animation:none!important}.progress i{transition:none!important}}
+.deck{perspective:2200px;perspective-origin:50% 45%;background:radial-gradient(circle at 50% 45%,#f5fbf8 0,#dce8e5 56%,#c8d7d3 100%);isolation:isolate}
+.deck:after{content:'';position:fixed;inset:0;pointer-events:none;z-index:20;opacity:0;background:linear-gradient(105deg,transparent 15%,rgba(156,255,0,.22) 46%,rgba(0,205,189,.28) 52%,transparent 82%);transform:translateX(-130%) skewX(-12deg)}
+.deck.transitioning:after{animation:lightSweep .88s cubic-bezier(.2,.75,.2,1)}
+.slide{display:block!important;visibility:hidden;opacity:0;pointer-events:none;transform-style:preserve-3d;backface-visibility:hidden;will-change:transform,opacity,clip-path,filter;z-index:0;filter:saturate(.88) blur(1px);clip-path:inset(0 0 0 0 round 0)}
+.slide.on{visibility:visible;pointer-events:auto;z-index:3}
+/* Alternancia cinematografica: avanço e retorno mantêm direção visual */
+.slide.enter-right{transform:translate3d(10%,0,-90px) rotateY(-5deg) scale(.975);opacity:0;clip-path:inset(0 0 0 16% round 28px)}
+.slide.enter-left{transform:translate3d(-10%,0,-90px) rotateY(5deg) scale(.975);opacity:0;clip-path:inset(0 16% 0 0 round 28px)}
+.slide.enter-right.settled,.slide.enter-left.settled,.slide.on.settled{transform:translate3d(0,0,0) rotateY(0) scale(1);opacity:1;filter:none;clip-path:inset(0 0 0 0 round 0);transition:transform .82s cubic-bezier(.16,1,.3,1),opacity .46s ease,clip-path .82s cubic-bezier(.16,1,.3,1),filter .55s ease}
+.slide.exit-left{visibility:visible;transform:translate3d(-8%,0,-130px) rotateY(4deg) scale(.955);opacity:0;filter:saturate(.7) blur(4px);clip-path:inset(0 13% 0 0 round 30px);transition:transform .68s cubic-bezier(.4,0,.2,1),opacity .48s ease,clip-path .68s ease,filter .48s ease;z-index:1}
+.slide.exit-right{visibility:visible;transform:translate3d(8%,0,-130px) rotateY(-4deg) scale(.955);opacity:0;filter:saturate(.7) blur(4px);clip-path:inset(0 0 0 13% round 30px);transition:transform .68s cubic-bezier(.4,0,.2,1),opacity .48s ease,clip-path .68s ease,filter .48s ease;z-index:1}
+/* Luz de entrada aplicada sem alterar o conteúdo ou a identidade visual */
+.slide:not(.cover):before{content:'';position:absolute;inset:0;z-index:30;pointer-events:none;opacity:0;background:linear-gradient(115deg,transparent 0 38%,rgba(156,255,0,.20) 47%,rgba(0,205,189,.22) 52%,transparent 63%);transform:translateX(-120%)}
+.slide.on.settled:not(.cover):before{animation:slideShimmer .82s .06s cubic-bezier(.22,.8,.2,1) both}
+/* Entrada escalonada de títulos, cartões, gráficos e tabelas */
+.slide.on.settled header{animation:headerDrop .62s .12s cubic-bezier(.16,1,.3,1) both}
+.slide.on.settled .kgrid>*,.slide.on.settled .manager-grid>*,.slide.on.settled .compare>*,.slide.on.settled .bars,.slide.on.settled .table,.slide.on.settled .alert,.slide.on.settled .badges,.slide.on.settled .recs>*,.slide.on.settled .closing,.slide.on.settled .quality-context,.slide.on.settled .note,.slide.on.settled .mini{animation:contentRise .62s cubic-bezier(.16,1,.3,1) both}
+.slide.on.settled .kgrid>*:nth-child(1),.slide.on.settled .manager-grid>*:nth-child(1),.slide.on.settled .compare>*:nth-child(1),.slide.on.settled .recs>*:nth-child(1){animation-delay:.16s}
+.slide.on.settled .kgrid>*:nth-child(2),.slide.on.settled .manager-grid>*:nth-child(2),.slide.on.settled .compare>*:nth-child(2),.slide.on.settled .recs>*:nth-child(2){animation-delay:.22s}
+.slide.on.settled .kgrid>*:nth-child(3),.slide.on.settled .manager-grid>*:nth-child(3),.slide.on.settled .compare>*:nth-child(3),.slide.on.settled .recs>*:nth-child(3){animation-delay:.28s}
+.slide.on.settled .kgrid>*:nth-child(n+4),.slide.on.settled .compare>*:nth-child(4),.slide.on.settled .recs>*:nth-child(n+4),.slide.on.settled .bars,.slide.on.settled .table{animation-delay:.34s}
+.slide.on.settled .track i{transform-origin:left center;animation:barGrow .88s .38s cubic-bezier(.16,1,.3,1) both}
+.slide.on.settled .badges span{animation:badgePop .48s cubic-bezier(.16,1.4,.3,1) both}
+.slide.on.settled .badges span:nth-child(2n){animation-delay:.08s}.slide.on.settled .badges span:nth-child(3n){animation-delay:.15s}
+.cover.on.settled .coverbody{animation:coverReveal .9s .05s cubic-bezier(.16,1,.3,1) both}
+.cover.on.settled .management-cover{animation:coverSide .82s .25s cubic-bezier(.16,1,.3,1) both}
+.cover.on.settled .coverfoot{animation:fadeIn .65s .48s ease both}
+.cover.on.settled:after{animation:orbPulse 8s ease-in-out infinite alternate}
+.nav{transition:opacity .25s ease,transform .25s ease,box-shadow .25s ease}.nav:hover{transform:translateX(-50%) translateY(-3px);box-shadow:0 16px 38px rgba(0,0,0,.28)}
+.progress i{transition:width .82s cubic-bezier(.16,1,.3,1)!important;box-shadow:0 0 14px rgba(156,255,0,.7)}
+@keyframes contentRise{from{opacity:0;transform:translateY(26px) scale(.97);filter:blur(3px)}to{opacity:1;transform:translateY(0) scale(1);filter:none}}
+@keyframes headerDrop{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes coverReveal{from{opacity:0;transform:translateX(-46px) scale(.98);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@keyframes coverSide{from{opacity:0;transform:translateX(44px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes barGrow{from{transform:scaleX(0);filter:brightness(1.45)}to{transform:scaleX(1);filter:none}}
+@keyframes badgePop{from{opacity:0;transform:scale(.72) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes lightSweep{0%{opacity:0;transform:translateX(-130%) skewX(-12deg)}35%{opacity:1}100%{opacity:0;transform:translateX(130%) skewX(-12deg)}}
+@keyframes slideShimmer{0%{opacity:0;transform:translateX(-120%)}30%{opacity:.9}100%{opacity:0;transform:translateX(120%)}}
+@keyframes orbPulse{from{transform:scale(1) rotate(0deg);opacity:.75}to{transform:scale(1.08) rotate(4deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){.deck:after,.slide,.slide.on,.slide.settled,.slide.exit-left,.slide.exit-right,.slide.enter-left,.slide.enter-right{transition:none!important;animation:none!important;transform:none!important;clip-path:none!important;filter:none!important}.slide.on{opacity:1!important}.slide.on *,.slide.on:before,.slide.on:after{animation:none!important}.progress i{transition:none!important}}
 
 /* Identificacao automatica da gerencia por responsavel e regional */
 .management-cover{display:flex;flex-direction:column;gap:3px;margin:0 0 12px;padding-left:12px;border-left:4px solid #00d4c0;color:#fff}
@@ -1164,9 +1198,147 @@ article strong{color:#14332d;font-family:'Arial Black',Arial,sans-serif;font-siz
 .cover .management-lower span{display:block!important;margin-top:4px!important;font:700 10px/1.2 Arial,sans-serif!important;letter-spacing:.06em!important;text-transform:uppercase!important}
 @media(max-width:1100px){.cover .management-cover.management-lower{top:61vh!important;width:340px!important}.cover .management-lower strong{font-size:16px!important}}
 @media(max-width:760px){.cover .management-cover.management-lower{left:28px!important;top:67vh!important;max-width:75vw!important;width:75vw!important}}
-@media print{body{overflow:visible;background:white}.slide{visibility:visible!important;opacity:1!important;transform:none!important;pointer-events:auto!important}.slide{display:block!important;position:relative;width:297mm;height:167mm;page-break-after:always}.nav{display:none}}`;
+@media print{body{overflow:visible;background:white}.slide{visibility:visible!important;opacity:1!important;transform:none!important;pointer-events:auto!important}.slide{display:block!important;position:relative;width:297mm;height:167mm;page-break-after:always}.nav{display:none}}.energy-logo-transition{position:fixed;inset:0;z-index:80;display:grid;place-items:center;pointer-events:none;visibility:hidden;opacity:0;overflow:hidden;background:radial-gradient(circle,rgba(5,38,35,.86),rgba(5,8,8,.98))}.energy-logo-transition:before{content:'';position:absolute;inset:-25%;opacity:0;background:repeating-conic-gradient(from 12deg,transparent 0 12deg,rgba(156,255,0,.8) 12.4deg 12.8deg,transparent 13.2deg 27deg,rgba(0,212,192,.7) 27.4deg 27.8deg,transparent 28.2deg 44deg);mask-image:radial-gradient(circle,transparent 12%,#000 20% 48%,transparent 68%)}.energy-logo-core{position:relative;width:min(54vw,780px);padding:4vw;opacity:0;transform:scale(.68);filter:brightness(2.15) blur(5px) drop-shadow(0 0 28px rgba(156,255,0,.9))}.energy-logo-core img{display:block;width:100%;filter:invert(92%) sepia(85%) saturate(1700%) hue-rotate(31deg) brightness(116%);clip-path:inset(0 100% 0 0)}.energy-bolt{position:absolute;left:50%;top:50%;width:76vw;height:4px;opacity:0;background:linear-gradient(90deg,transparent,#00d4c0 22%,#fff 50%,#9cff00 78%,transparent);box-shadow:0 0 10px rgba(255,255,255,.9),0 0 30px rgba(156,255,0,.85);transform:translate(-50%,-50%) rotate(-7deg) scaleX(.1)}.energy-logo-transition.active{visibility:visible;animation:eBack 1.48s cubic-bezier(.22,.75,.18,1) both}.energy-logo-transition.active:before{animation:eArcs 1.48s cubic-bezier(.22,.75,.18,1) both}.energy-logo-transition.active .energy-logo-core{animation:eCharge 1.48s cubic-bezier(.16,.82,.2,1) both}.energy-logo-transition.active img{animation:eTrace 1.48s cubic-bezier(.22,.75,.18,1) both}.energy-logo-transition.active .energy-bolt{animation:eBolt 1.48s cubic-bezier(.22,.75,.18,1) both}@keyframes eBack{0%{opacity:0}18%{opacity:1}76%{opacity:1}100%{opacity:0}}@keyframes eTrace{0%,14%{clip-path:inset(0 100% 0 0)}62%,100%{clip-path:inset(0)}}@keyframes eCharge{0%{opacity:0;transform:scale(.68)}24%,76%{opacity:1}58%{transform:scale(1);filter:brightness(1.4) blur(0) drop-shadow(0 0 34px #00d4c0)}100%{opacity:0;transform:scale(1.06);filter:brightness(1.2) blur(3px)}}@keyframes eArcs{0%{opacity:0;transform:scale(.3) rotate(-20deg)}30%{opacity:.9}70%{opacity:.5;transform:scale(1.05) rotate(22deg)}100%{opacity:0;transform:scale(1.3) rotate(38deg)}}@keyframes eBolt{0%,14%{opacity:0;transform:translate(-50%,-50%) rotate(-7deg) scaleX(.1)}22%,37%,63%{opacity:1}28%,52%{opacity:.15}70%{transform:translate(-50%,-50%) rotate(-7deg) scaleX(1)}100%{opacity:0;transform:translate(-50%,-50%) rotate(-7deg) scaleX(1.1)}}@media(prefers-reduced-motion:reduce){.energy-logo-transition{display:none!important}}
+/* =========================================================
+   PEGADA VISUAL DE ENERGIA EM TODA A APRESENTACAO
+   Efeitos sutis para manter legibilidade e aspecto executivo
+   ========================================================= */
+:root{--energy-lime:#9cff00;--energy-teal:#00b8a9;--energy-cyan:#00e6d2;--energy-dark:#0b2421}
+
+/* Linha de energia no topo e pulso luminoso de cada slide */
+.slide:after{content:'';position:absolute;left:0;top:0;width:100%;height:7px;z-index:35;pointer-events:none;background:linear-gradient(90deg,#9cff00 0%,#d8ff63 20%,#00e6d2 48%,#008c89 72%,#9cff00 100%);background-size:240% 100%;box-shadow:0 0 9px rgba(156,255,0,.72),0 0 20px rgba(0,230,210,.28);animation:energyLineFlow 4.8s linear infinite}
+.slide.on.settled:after{animation:energyLineCharge .95s cubic-bezier(.16,1,.3,1) both,energyLineFlow 4.8s 1s linear infinite}
+
+/* Trilha eletrica vertical discreta na lateral */
+.slide:not(.cover) .energy-rail{position:fixed;left:1.55vw;top:19vh;bottom:13vh;width:2px;z-index:12;pointer-events:none;background:linear-gradient(180deg,transparent,#9cff00 12%,#00d4c0 48%,#9cff00 82%,transparent);box-shadow:0 0 7px #9cff00;opacity:.56}
+.slide:not(.cover) .energy-rail:before,.slide:not(.cover) .energy-rail:after{content:'';position:absolute;left:50%;width:9px;height:9px;border-radius:50%;background:#eaffc7;box-shadow:0 0 7px 2px #9cff00,0 0 17px 5px rgba(0,212,192,.55);transform:translateX(-50%)}
+.slide:not(.cover) .energy-rail:before{animation:energyNodeDown 3.7s ease-in-out infinite}.slide:not(.cover) .energy-rail:after{animation:energyNodeDown 3.7s 1.85s ease-in-out infinite}
+
+/* Cabecalho energizado */
+.slide header{overflow:visible}
+.slide header:before{content:'';position:absolute;left:174px;bottom:-3px;width:0;height:4px;background:linear-gradient(90deg,#9cff00,#fff,#00d4c0);box-shadow:0 0 8px #9cff00;opacity:0}
+.slide.on.settled header:before{animation:headerEnergyTrace 1.15s .14s cubic-bezier(.16,1,.3,1) forwards}
+.slide header img{transition:filter .35s ease,transform .35s ease}.slide header img:hover{filter:drop-shadow(0 0 7px rgba(156,255,0,.85));transform:scale(1.025)}
+
+/* Cartoes e paineis com borda eletrica elegante */
+.kgrid>*,.manager-grid>*,.compare>article,.recs>*,.quality-context,.alert,.note,.closing,.financial-status,.cost-panel{position:relative;overflow:hidden;isolation:isolate}
+.kgrid>*:before,.manager-grid>*:before,.compare>article:before,.recs>*:before,.quality-context:before,.alert:before,.financial-status:before{content:'';position:absolute;left:-45%;top:0;width:38%;height:2px;z-index:4;background:linear-gradient(90deg,transparent,#fff,#9cff00,#00d4c0,transparent);box-shadow:0 0 7px #9cff00;opacity:0}
+.slide.on.settled .kgrid>*:before,.slide.on.settled .manager-grid>*:before,.slide.on.settled .compare>article:before,.slide.on.settled .recs>*:before,.slide.on.settled .quality-context:before,.slide.on.settled .alert:before,.slide.on.settled .financial-status:before{animation:cardEnergySweep 1.15s .28s cubic-bezier(.2,.8,.2,1) both}
+.kgrid>*:hover,.manager-grid>*:hover,.compare>article:hover,.recs>*:hover{box-shadow:0 14px 30px rgba(0,140,137,.14),0 0 0 1px rgba(156,255,0,.55),inset 0 0 18px rgba(156,255,0,.035)!important;transform:translateY(-3px);transition:transform .25s ease,box-shadow .25s ease}
+
+/* Indicadores numericos recebem pulso curto na entrada */
+.slide.on.settled .kgrid strong,.slide.on.settled .manager-grid strong,.slide.on.settled .compare strong,.slide.on.settled .cost-value{animation:metricCharge .72s .35s cubic-bezier(.16,1,.3,1) both}
+
+/* Graficos com aparencia de fluxo de energia */
+.track{overflow:visible!important;background:linear-gradient(90deg,#e4ece9,#f4faf7)!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.08)}
+.track i{position:relative;overflow:visible;background:linear-gradient(90deg,#008c89,#00d4c0,#9cff00)!important;background-size:180% 100%!important;box-shadow:0 0 9px rgba(0,212,192,.42);animation:barEnergyFlow 2.6s linear infinite!important}
+.track i:after{content:'';position:absolute;right:-4px;top:50%;width:8px;height:8px;border-radius:50%;background:#efffd9;box-shadow:0 0 6px 2px #9cff00,0 0 14px 4px rgba(0,212,192,.5);transform:translateY(-50%)}
+
+/* Tabelas ganham varredura luminosa sem prejudicar leitura */
+.table,.email-table{position:relative}
+.table tbody tr,.email-table tbody tr{transition:background .2s ease,box-shadow .2s ease}
+.table tbody tr:hover,.email-table tbody tr:hover{background:linear-gradient(90deg,rgba(156,255,0,.10),rgba(0,212,192,.06),transparent)!important;box-shadow:inset 3px 0 #9cff00}
+.table thead th,.email-table thead th{position:relative}
+.table thead th:after,.email-table thead th:after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#9cff00,#00d4c0);opacity:.75}
+
+/* Setas e destaques com descarga controlada */
+.arrow{filter:drop-shadow(0 0 5px rgba(156,255,0,.7));animation:arrowEnergyPulse 2.4s ease-in-out infinite}
+.risk{filter:drop-shadow(0 0 3px rgba(180,35,24,.18))}.ok{filter:drop-shadow(0 0 3px rgba(24,121,78,.18))}
+
+/* Capa com circuito energetico decorativo */
+.cover .coverbody:before{content:'';position:absolute;left:-4.5vw;top:-3vh;width:3px;height:0;background:linear-gradient(180deg,#9cff00,#00d4c0,transparent);box-shadow:0 0 10px #9cff00;border-radius:4px}
+.cover.on.settled .coverbody:before{animation:coverEnergyStem 1.25s .18s cubic-bezier(.16,1,.3,1) forwards}
+.cover .periodbox,.cover .management-cover{box-shadow:0 14px 32px rgba(0,0,0,.12),0 0 0 1px rgba(156,255,0,.18)}
+
+/* Navegacao com identidade energetica */
+.nav button:hover{color:#9cff00!important;text-shadow:0 0 8px rgba(156,255,0,.65)}
+.nav .ppt:hover{box-shadow:0 0 0 1px rgba(156,255,0,.55),0 0 18px rgba(0,212,192,.38)}
+
+@keyframes energyLineFlow{to{background-position:-240% 0}}
+@keyframes energyLineCharge{0%{transform:scaleX(0);filter:brightness(2.4)}55%{transform:scaleX(1);filter:brightness(1.8)}100%{transform:scaleX(1);filter:none}}
+@keyframes energyNodeDown{0%{top:0;opacity:0}14%{opacity:1}50%{opacity:.9}86%{opacity:1}100%{top:100%;opacity:0}}
+@keyframes headerEnergyTrace{0%{width:0;opacity:0}12%{opacity:1}70%{width:58%;opacity:1}100%{width:120px;opacity:.75}}
+@keyframes cardEnergySweep{0%{left:-45%;opacity:0}18%{opacity:1}80%{opacity:.9}100%{left:108%;opacity:0}}
+@keyframes metricCharge{0%{opacity:.2;transform:scale(.84);filter:brightness(2.3) blur(2px)}58%{opacity:1;transform:scale(1.045);filter:brightness(1.35)}100%{transform:scale(1);filter:none}}
+@keyframes barEnergyFlow{to{background-position:-180% 0}}
+@keyframes arrowEnergyPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px rgba(156,255,0,.4))}50%{transform:scale(1.12);filter:drop-shadow(0 0 9px rgba(156,255,0,.9))}}
+@keyframes coverEnergyStem{0%{height:0;opacity:0}20%{opacity:1}100%{height:64vh;opacity:.7}}
+
+@media(prefers-reduced-motion:reduce){.slide:after,.energy-rail:before,.energy-rail:after,.slide header:before,.kgrid>*:before,.manager-grid>*:before,.compare>article:before,.recs>*:before,.track i,.arrow,.cover .coverbody:before{animation:none!important}.slide:after{background-position:0 0}.energy-rail:before,.energy-rail:after{display:none}}
+
+/* =========================================================
+   LAYOUT INSPIRADO NA PROPAGANDA DE ENERGIA
+   Paleta: azul-petroleo, turquesa eletrico, ciano e verde-lima
+   ========================================================= */
+:root{--ad-night:#031f26;--ad-deep:#07343a;--ad-teal:#00c9bd;--ad-cyan:#22f2e1;--ad-lime:#b8ff20;--ad-ice:#ecfffb}
+
+/* Remove totalmente a barra inferior "Light | Prontos e Energizados" */
+.slide:not(.cover)::after{content:none!important;display:none!important}
+
+/* Fundo executivo claro com atmosfera azul-petroleo e feixes da campanha */
+.slide:not(.cover){background:
+ linear-gradient(128deg,transparent 0 62%,rgba(0,201,189,.045) 62.2% 62.55%,transparent 62.8%),
+ linear-gradient(142deg,transparent 0 72%,rgba(184,255,32,.055) 72.2% 72.5%,transparent 72.8%),
+ linear-gradient(160deg,#fff 0 74%,#edfffb 100%)!important;padding-bottom:5.2vh!important}
+.slide:not(.cover):before{content:''!important;position:absolute!important;inset:0!important;z-index:0!important;pointer-events:none!important;opacity:.9!important;background:
+ linear-gradient(118deg,transparent 0 76%,rgba(34,242,225,.10) 76.15% 76.28%,transparent 76.45%),
+ linear-gradient(131deg,transparent 0 82%,rgba(184,255,32,.12) 82.12% 82.24%,transparent 82.4%)!important;transform:none!important}
+.slide:not(.cover)>*{position:relative;z-index:2}
+
+/* Remove a antiga haste lateral e substitui por feixes diagonais discretos */
+.energy-rail{display:none!important}
+.slide:not(.cover) .energy-beams{position:absolute;right:-5vw;top:-8vh;width:44vw;height:52vh;z-index:1;pointer-events:none;opacity:.52;transform:rotate(-4deg);background:
+ linear-gradient(142deg,transparent 0 47%,rgba(34,242,225,.9) 47.15% 47.34%,transparent 47.5%),
+ linear-gradient(151deg,transparent 0 55%,rgba(184,255,32,.72) 55.12% 55.27%,transparent 55.45%),
+ linear-gradient(132deg,transparent 0 63%,rgba(0,201,189,.65) 63.1% 63.24%,transparent 63.42%);filter:drop-shadow(0 0 7px rgba(0,201,189,.5))}
+.slide.on.settled .energy-beams{animation:adBeamsIn 1.1s cubic-bezier(.16,1,.3,1) both}
+
+/* Cabecalho escuro semelhante ao contraste visual da propaganda */
+.slide:not(.cover) header{margin:-1.2vh -1.2vw 3vh!important;padding:16px 1.25vw 18px!important;border:0!important;border-radius:0 0 18px 18px;background:linear-gradient(105deg,var(--ad-night),var(--ad-deep) 68%,#07525a)!important;box-shadow:0 12px 30px rgba(3,31,38,.16);color:#fff}
+.slide:not(.cover) header:after{left:175px!important;bottom:0!important;width:145px!important;height:4px!important;background:linear-gradient(90deg,var(--ad-lime),var(--ad-cyan))!important;box-shadow:0 0 12px rgba(184,255,32,.65)}
+.slide:not(.cover) header small{color:var(--ad-lime)!important}.slide:not(.cover) header h2{color:#fff!important}.slide:not(.cover) header>b{background:rgba(255,255,255,.08)!important;color:var(--ad-lime)!important;border:1px solid rgba(34,242,225,.4);box-shadow:0 0 16px rgba(0,201,189,.16)}
+.slide:not(.cover) header img{background:#fff;border-radius:10px;padding:5px;mix-blend-mode:normal!important}
+
+/* Capa com a mesma linguagem de velocidade e energia */
+.cover{background:
+ radial-gradient(circle at 74% 28%,rgba(0,201,189,.24),transparent 27%),
+ linear-gradient(116deg,var(--ad-night) 0 52%,#06464b 68%,#00a99f 100%)!important;color:#fff}
+.cover:before{content:'';position:absolute;inset:-8%;z-index:0;pointer-events:none;background:
+ linear-gradient(142deg,transparent 0 49%,rgba(34,242,225,.88) 49.1% 49.28%,transparent 49.42%),
+ linear-gradient(151deg,transparent 0 58%,rgba(184,255,32,.8) 58.1% 58.3%,transparent 58.45%),
+ linear-gradient(130deg,transparent 0 68%,rgba(255,255,255,.4) 68.08% 68.17%,transparent 68.3%);filter:drop-shadow(0 0 10px rgba(34,242,225,.45));animation:coverLaserDrift 7s ease-in-out infinite alternate}
+.cover>*{position:relative;z-index:2}.cover .brand{color:var(--ad-lime)!important;border-top-color:var(--ad-lime)!important}.cover .brand img{background:#fff;border-radius:12px;padding:6px;mix-blend-mode:normal!important}.cover h1{color:#fff!important;text-shadow:0 8px 30px rgba(0,0,0,.32)}.cover h1 em{color:var(--ad-lime)!important}.cover p{color:#d9fffa!important}.cover .period,.cover .periodbox{background:rgba(3,31,38,.88)!important;color:var(--ad-lime)!important;border:1px solid rgba(34,242,225,.45)}.cover .management-cover{background:rgba(3,31,38,.82)!important;border-color:rgba(184,255,32,.45)!important;color:#fff!important;backdrop-filter:blur(7px)}
+
+/* Cartoes e KPIs adotam a paleta da campanha */
+.kgrid>*,.manager-grid>*,.compare>article,.recs>*,.quality-context,.alert,.note,.closing,.financial-status{border-color:rgba(0,201,189,.25)!important;box-shadow:0 9px 24px rgba(3,52,58,.08)}
+.kgrid>*:after,.manager-grid>*:after,.compare>article:after,.recs>*:after{content:'';position:absolute;left:0;top:0;width:4px;height:100%;background:linear-gradient(180deg,var(--ad-lime),var(--ad-teal));opacity:.9}
+.kgrid strong,.manager-grid strong,.compare strong{color:var(--ad-deep)!important}.kgrid small,.manager-grid small,.compare small{color:#08766f!important}
+
+/* Tabelas no azul-petroleo da propaganda */
+.table thead,.email-table thead{background:linear-gradient(90deg,var(--ad-night),var(--ad-deep))!important}.table thead th,.email-table thead th{color:#fff!important}.table thead th:after,.email-table thead th:after{background:linear-gradient(90deg,var(--ad-lime),var(--ad-cyan))!important}.table tbody tr:hover,.email-table tbody tr:hover{background:linear-gradient(90deg,rgba(184,255,32,.12),rgba(34,242,225,.09),transparent)!important;box-shadow:inset 4px 0 var(--ad-lime)!important}
+
+/* Graficos: turquesa, ciano e verde-lima */
+.track i{background:linear-gradient(90deg,#006f72,var(--ad-teal),var(--ad-cyan),var(--ad-lime))!important;background-size:210% 100%!important}.track i:after{background:#fff!important;box-shadow:0 0 6px 2px var(--ad-lime),0 0 16px 5px rgba(34,242,225,.68)!important}.arrow{color:var(--ad-teal)!important}
+
+/* Navegacao harmonizada, sem texto publicitario */
+.nav{background:linear-gradient(90deg,var(--ad-night),var(--ad-deep))!important;border:1px solid rgba(34,242,225,.33)}.nav button{background:var(--ad-teal)!important;color:var(--ad-night)!important}.nav button:hover{background:var(--ad-lime)!important;color:var(--ad-night)!important;text-shadow:none!important}.progress i{background:linear-gradient(90deg,var(--ad-lime),var(--ad-cyan))!important}
+
+/* Nova transicao: feixes velozes atravessam a tela antes do proximo slide */
+.deck:after{background:
+ linear-gradient(135deg,transparent 0 34%,rgba(184,255,32,.88) 34.2% 34.55%,transparent 34.8% 43%,rgba(34,242,225,.9) 43.2% 43.6%,transparent 44% 53%,rgba(255,255,255,.75) 53.2% 53.42%,transparent 53.8%),
+ linear-gradient(90deg,transparent,rgba(0,201,189,.32),transparent)!important;filter:drop-shadow(0 0 12px rgba(34,242,225,.65))}
+.deck.transitioning:after{animation:campaignSweep 1.34s cubic-bezier(.2,.78,.2,1)!important}
+.slide.enter-right{transform:translate3d(8%,0,-75px) scale(.985)!important;clip-path:polygon(12% 0,100% 0,100% 100%,0 100%)!important}.slide.enter-left{transform:translate3d(-8%,0,-75px) scale(.985)!important;clip-path:polygon(0 0,88% 0,100% 100%,0 100%)!important}.slide.enter-right.settled,.slide.enter-left.settled,.slide.on.settled{clip-path:polygon(0 0,100% 0,100% 100%,0 100%)!important}
+
+@keyframes adBeamsIn{from{opacity:0;transform:translate(18%,-12%) rotate(-4deg) scaleX(.65)}to{opacity:.52;transform:translate(0,0) rotate(-4deg) scaleX(1)}}
+@keyframes coverLaserDrift{from{transform:translate(-2%,-1%) scale(1)}to{transform:translate(3%,2%) scale(1.05)}}
+@keyframes campaignSweep{0%{opacity:0;transform:translateX(-125%) skewX(-9deg)}20%{opacity:1}72%{opacity:.95}100%{opacity:0;transform:translateX(125%) skewX(-9deg)}}
+@media(prefers-reduced-motion:reduce){.energy-beams,.cover:before{animation:none!important}}
+`;
         const navScript = `let a=0,busy=false,S=[...document.querySelectorAll('.slide')],c=document.getElementById('count'),pb=document.getElementById('progressBar'),reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function activate(n,dir=1,first=false){n=Math.max(0,Math.min(S.length-1,n));if((n===a&&!first)||busy)return;const old=S[a],next=S[n];busy=!reduce&&!first;if(!first&&old){old.classList.remove('enter-left','enter-right','settled');old.classList.add(dir>0?'exit-left':'exit-right')}next.classList.remove('exit-left','exit-right');next.classList.add('on',dir>0?'enter-right':'enter-left');a=n;c.textContent=(a+1)+' / '+S.length;pb.style.width=((a+1)/S.length*100)+'%';requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('settled')));setTimeout(()=>{S.forEach((slide,i)=>{if(i!==a)slide.classList.remove('on','settled','enter-left','enter-right','exit-left','exit-right')});next.classList.remove('enter-left','enter-right','exit-left','exit-right');next.classList.add('on','settled');busy=false},reduce||first?0:620)}
+const energyFX=document.createElement('div');energyFX.className='energy-logo-transition';energyFX.innerHTML='<span class=\"energy-bolt\"></span><div class=\"energy-logo-core\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABaoAAAIkCAYAAAD/BBxBAAAnnUlEQVR42u3dWW7cSBYFUInIhdhA7X9FBuydqD+q3JLlTCWHIOMN5wD921UiY7hxFUW9vr29vQAwzz/fvk9fiH/8+vnqTQAAAACzLB4BwDwRSmoAAACA2RTVAJMoqQEAAAD+pagGmCBSSe2zHwAAAMBsimqAiympAQAAAP6kqAYAAAAAYCpFNcCF3KYGAAAA+JuiGuAiSmoAAACA+xTVABeIVFIDAAAARKOoBjhZtJLabWoAAAAgGkU1wImU1AAAAADPKaoBAAAAAJhKUQ1wErepAQAAANZRVAOcwB9PBAAAAFhPUQ0wWMSS2m1qAAAAIDJFNcBASmoAAACA7RTVAIP43AcAAADAPopqgMLcpgYAAAAyUFQDDOCTHwAAAAD7KaoBDvLJDwAAAIBjFNUAB0Qtqd2mBgAAADJRVAPspKQGAAAAGENRDbCDz30AAAAAjKOoBijEbWoAAAAgI0U1wEY++QEAAAAwlqIaYAOf/AAAAAAYT1ENsFLkktptagAAACAzRTXACkpqAAAAgPMoqgGe8LkPAAAAgHMpqgG+EL2kdpsaAAAAqEBRDZCUkhoAAACoQlEN8IBPfgAAAABcQ1ENcIdPfgAAAABcR1EN8Imb1AAAAADXUlQDfJChpHabGgAAAKjm5hHANTLd0u1ahCqpAQAAAOZQVMMA1T4VsfbnUZoCAAAAMMLr25tPscIavlu8TbYS221qAAAAgHkU1fCJQnqsDOWqkhoAAABgLp/+oDWlNMYAAAAAwHyKatpQSF4v+i3gLGPCbWoAAACgOkU1ZSmm51JS93iOAAAAACMoqilDMR2HchUAAACALRTVpKWYpvrYUfgDAAAAXSiqSUU5HZ9PfvR4jgAAAAAjKaoJTTGdi5IaAAAAgD0U1YSjTMxJSd3nWQIAAACMpqgmBOV0bkrqPs8SAAAA4AyKaqZRTtegWAUAAADgKEU1l1NQY7zdp/QHAAAAulJUcwnldE0++dHnWQIAAACcSVHNaZTTtSmpAQAAABhFUc1wCsL6lNS9nicAAADA2RTVDKGc7kNJDQAAAMBoimoOUQr24uavZwoAAABwBkU1uyio+8lQqPrkBwAAAEBOimo2UVBjbAIAAAAwmqKaVZSAvfkudb9nCgAAAHAlRTUPKad5eVFSd3ymAAAAAFdTVPMXBTW/KakBAAAAuIKimv9T+vGRW78AAAAAXOX17U032Z2Cms8ylNQVxq1fBgAAAAD8a/EIelNSY9zO/TnMQQAAAAA3qttSjvGI71J79gAAAABXU1Q3o6DmK0pq7wEAAABgBkV1EwpqnlFSeycAAAAAsyiqi1NQs4aS2rsBAAAAmMkfUyxMSc0aitD489hcBgAAAKpzo7ogpRZrZSipjed87wwAAABgKzeqC3Hzkopj2lPwTAAAAID63KguQnnFVr5L7R0CAAAARKGoTk6Zxx5Kau8TAAAAIBJFdVKKPPZSUnuvAAAAANH4RnVCijz2UmbWXhesDQAAAEBWblQnooTiiAwltTHe510DAAAAfORGdRIKPIxxtjxLzxMAAADIxI3q4JRNjOC71N49AAAAQGSK6sCUd4ygpCbDOAAAAAB68+mPoJR3jKCkxrMGAAAAMrh5BLEok/pww5VZ64uxBwAAAETj0x+BKKnrUAQa78YoAAAAwHqK6gAUdnkp+4x54xcAAADgOEX1ZAq7PJR6xryxDQAAAHAORfVECru4FHfGvDEPAAAAcB1F9QTKuniUdMY95gEAAAAwz80juJayLgaFHDxen8wPAAAA4GpuVF9IST2P4s3Yx5wBAAAA4lJUX0RRdz1Fm7GPOQQAAADkoKg+mZLuWoo14x9zCgAAAMhHUX0iJd01FGnGP+YZAAAAkJui+iRKunMpzYx/zDsAAACgjsUjGE9Jd54fv36+KsvA2gYAAADU4kb1YIqc8RTT5gDmJAAAAFCbonoQ5dx4yjDzAPMTAAAA6EFRPYBybhzll3mA+QoAAAD0o6g+SDk3hsLLPMD8BQAAAPpSVB+gnDtOwWUeYC4DAAAAKKp3Us4do9QyDzCvAQAAAH67eQTbKef2U2SRZXya5/vWRnMcAAAA2MON6o2UV/sor8yFrOPUnDffAQAAgPMpqjdQWG2nsDIXqoxV89/cBwAAAM6jqF5JSbWNkspcqDherQPWAQAAAOAciuoVlFPrKabMhQ7j1ppgTQAAAADGUlQ/oZBaRxllLnQcu9YH6wMAAAAwxuIRPKaEeu7Hr5+vSiiMf6ylAAAAwBFuVD+gWPmacs58MI6tG9YNAAAAYBQ3qu9QNn1N2WQ+GMfmhrEEAAAAjORG9SeKlMeUcOaD8ezZWUsAAACAM7hR/YFi6THFkvlgPJszxhYAAABwFjeq/6M4uU/ZZj4Y056n9QUAAAA4mxvVL0qke378+vmqRIJx88lTsPYCAAAAj7W/Ua0o+ZtS7cWcMLY9X2sOAAAAcKHWRbXC6E/KIpTUnrP3AwAAAMzQ9tMfiqI/KYkwJ66db+ac8QcAAAC8a3mjWiHyTllGhzkReZxbj6xJAAAAQMMb1UqhdwohOsyJ6OPc7WoAAACAZkW1kvqdYgzMSes0AAAAEEWbT38oP/6lDKPTvMg43q1V1ioAAADoaPEI+lD88JFCNO48NVeNTwAAAOimRVGt8FBS029OZB/z5qy1GwAAADop/+mP7kWHsouOc6LSuFfWWscAAACgg9I3qpXUyh3MCfPYuAUAAADiK1tUK6mVWxj7lX4mcxoAAACorGRRraRWaNFzXlQf+53ntlvVAAAAUNvNI6hDQc0jSr5a87zr+/zn2/c36xxAj0xivQcA6KfcH1PsWuAI83SfE93mQOdfPljvAPruU/YAAIC6ShXVSmroOSe6zgFlNQCd9yV7AQBALWU+/aGkBnOi4/z3ngHomjc+/rNlYgCA/MrcqO5Y1gjkmA/mgTUQAPuOvQEAoIISRbWCBnrOCfPAWmgMANhr7A8AADUswnI+gjfmBNYG4x3Amvv1v6s9AgAgl9Q3qruFTwU15oT5YBwYCwD2FfsEAEBFi0cgYOMQifXC2Aeg6hprnwAAyCHtjWo3R6HvAcycMC6MC8wB8wFzyLwArHnWRTB/a1kMQAMPC7I54VmZCwBUX1N9txoAILZ0RbWSGsA6AoC8DQBALb5RHZRyCQdJ88JzMycArKN+RgCALlIV1V1CpTIO88G88PzMDQDrp58VAKCTNEW1khocrrC+ACBb+JkBAGry6Y9AlEg4VJkbnqV5AoD9AgCgoxRFdYcAqYjDXDA3PFPzBcB6CQBAV+GLaiU1gHUHAFnbMwAAqM2nP8AhKixlqudr3gAAAEAPoYtqt6mhz1wwNzB/AKyPngUAQF9hi2olNTg4YR0CAAAAevDpj0mUQ6zRtaQ2PzxvcwkAewUAQC8hi+rqIVEJh3mAdcmcArAmAgDAu3BFtZIaejNHPHsAAACgH5/+uJASiLV88gPvwNwCwD4BANBJqKK6cjBUwGEeYL0CQNYAAID7whTVAjP0ngfKUcwzAAAA6MunPy6ggGMNJTXeifkGAAAAXYUoqn3yg+6UZli/AEAuAwDozI3qEyl5wDzxfuJSRAAdWfsAAIhqelFdNSwr33BgNE+8JwAAAIB13KiGidxqAnMQAAAAmFxUu01NZ90LMvPE+zIXAQAAgN+mFdVKajpTUpsn3hsAAADAO5/+GEiJwxpub2KdMy8BAACAP00pqhUC0Jdf6AAAAADwmRvVgyjfWMMvabDemZ8AAADA3y4vqisWAUpquo59c8W7BAAAABjBjeqDlDWsoaQ2V7xTcxUAAAB47NKiWgFAR8Y9AAAAAHzNjeoD3BDlGSW1ueLdmrcAAADAc5cV1dUO/oo3uo15cwXvGMCaDQAAZ3GjGgA+8YsmgL6U+QAAc1xSVLtNTTdKLnPFuwYAAABYz43qjZQxPKOkNle8c3MZAAAA2Ob0otpBn06MdwAgOr9MBgAgIjeqhXoGUVKbK7hVDYB9DACAfU4tqisd8IVWuox1cwVjAAAAALiaG9UA8AW/iAIq8ktFAACiOa2odpuaLpRY5grGAgD2LgAAjnGjGg5QUoO5DgAAABx3SlHtNjUdKK7MFYwJAOu0ZwEAwBhuVAus7KCkNlfoNzbMewAAADjP8KLaQZ7qjHEAoAq/bPYMAACicKNaYAVzBWMEwDoNAABTKaphA7epHWyxBngKALIMAADjDS2qqxzgBVYqj2+wrgJgnbY3AQBE40Y1rKCkdrgD6wFgb/ezAgBwnmFFtdvUVKWUMk8wbgCs1QAAcC43qgVzvqCkBqwNgEzs5wMA4HxDimoHdnB4BeMHwHrt5wIAYC83qoVWHvALGPME4wjAel3nZ7H/AADEpqiGO5TUgHUCoEZZraAGAMjhcFFd4aAuvFJtTJsnGE8AjFyzs67b9hsAgDzcqIYPlNSANQPgvkylr099AADkc6iodpuaShRO5gnGFQDP1+7I67eCGgAgr5tHADw78HkKAMC9fBDlF/3yCgBAfq0//SHQ8pvb1GAdtn4A7FvHZ95idoMaAKCO3TeqHcypwlj++vDnKQAAW3PDWflKNgEAqMunP2hNSe0gCABclyPWZi85BACgn7ZFtfCLkhrirMfZ5+M/376/2VcAZHAAAPbb9Y1qBR/ZGcMOkQAAAADE0fKPKSrhelNSmx8YdwAAAEAsi0cAAMf5JRgAAADst7mozn4Qd2uvN0WS+YHxBwAAAMTjRjVtKKm/piQEAAAAYJZWRbUiri8lNVinrTUAAAAQ16ai2gGcjIzb5/wSBwAAAICZfPqD0pTUAAAAABBfm6LajVEwNzAmr+AXZAAAALDd6qLawZtsjNnnlNQAAAAARNDiRrUyrh8lNVi3AQAAgDx8o5pylNTrKALBOgQAAABRrCqqHbjJwlhdR0kNAAAAQCTlb1Qr5PpQUoP1GwAAAMjJpz+gGeUfAAAAANEoqinBbep1lNRgXQIAAICInhbVmQ/aSrkelEFQl3UcAAAAenCjmtSU1Osp/AAAAACISlFNWkrq9ZTUAAAAAET2+vb2ddeXtQxUzNWmpIZe66/PUGGvMO4wX8wVjFnAum79pbabwQcAAEAUzqHA2euHQhtiunkECK7AKAIfACDbA1nXHucZmKtkUW1hEWSBWmvvj18/X81/AJDlAa5ep3RMcB03qhFsgcOEt6/XLs8HAPkdoMZaJtvDeW5CBUIucISgBgDI7UDHdc5ZCMYqd6PaIiHsAjXXXJ//AAB5HSDq+qePguN8+gOAXQQxAOhLOQ3weF10VoJ9Fo8AARjAWgYAa/c0+xqAtRLOcHOgJvLC7ilATG4IAIBsDsC6tdP5CdYp9ekPE18QBmqvtb5TDQAyOUDW9VRvBV/zjWoEYmA1wQoA5HEAjq2vzlVwn6IaoRhYRZgCAFkcgHHrrTMW/MkfU0QwBp4SoKxxANinABi/9lp/4d1SJaAoUQB6sN4DwDhKEoAYa7GnAD79gUUZeEIxDADyNwDXrMvOX3Tm0x8IycBDQhIAyN8AWKPhCopqLMDAXUpqAKiXveVvgBzrtadARyWKamWKhRfota5mXfetewDYgwBYu25bu+nGjWoEZeAPfvkHALI3ANZwuNpi8AMAANTjNh5AnfXcU6ADN6qxwAL/5zY1AMjcAFjXYQZFNRZW4OXlJV9JrVQHAJkbwPoOdaQvqhUVFlTAWgoAyNwA1nnIzY1qLKTQnJLaegiAPQYA6z3MpqjGAgqNKakBQOYGwLoPESwGOEBPSmoAqMFZDgCowI1qhGYAAJC3AbAHwFSpi2q3AS2YQO/10z4AgLwNgL0AanCjGgslNKPcBQB5GwB7AkSjqMYCCY0oqQFA3gYAiEhRjdAMTSipAUDeBsD+AFEpqgEaUFILkQDYPwCwT0BkimosiAAAAADAVMvLi4KR44whiKv6bWq3xQGQtwHAfkF+aW9UKyYsgoC1EgDkbQCAGnz6A6EZilJSA4C8DYC9A7JQVGPhg4KU1AAAAEAmimqAYpTUAFCDiyEA2EPoRFGNBQ8KUVIDgLwNAJCRohqhGQAAAKAY/Q3ZKKqxyEERblMDgMwNAJCVohqBGQpQUgMAAPCZLodMFNUAySmpcz4DgREA+wMAwLtbxn9ppYznDgAAAMBz/3z7/qbTIYObRwAAADCf29T7HSlgPHcAiOFmUwYAACCTkTcD7/1/OSePf87RdXznkd6vOWfcGD/W55cXN6oBAAAcsh3K7/6zur8Xnwsgwvy2PprP9KGoBgAAIKyZxcrHf3bXsky5RaQ1QGkNtSmqAQAAJlK83BetHO18y1pZTcR1wdoJ9SweAQAAAFH8+PXzNXIp2rWwVQoSda3wSxSoQ1ENAABACFkKp67lmLIaa4c5DGdSVAMAAEyiNPhX1uJXOQbWEWAcRTUAAADTZC+WuhVjfrlChjmpsIacFNUAAABMUaVMUlaDeQkcp6gGAACYoHvZV61EUoqBeWnvgWMU1QAAAFyqannUqRRTdmFeAqMpqgEAALhM9dJIKQbmJbCPohoAAOBibqPW1qUUM44xL4GRFNUAAABcQlEEADyiqAYAAOB03Upqt6rBvDRvYRtFNQAAAJxAKQYA6ymqAQAAOJXCtja3M7EeASMoqgEAAC6k1OtFKQYA6yiqAQAAOI2iFrAuAWsoqgEAAOBEHUox/6UAAEcpqgEAAABoxa1qiEdRDQAAwCkUQQAx+a8giEhRDQAAABym+ALgCEU1AAAAnMztcjAvga8pqgEAAC7ixikAwH2KagAAAIZzUxEA2EJRDQAAAADAVIpqAAAAYAiftyEb//UHxKGoBgAAAABgqsVvjgAAAOB8zt8A8Ngt47/0P9++v9ng/SdV4BACAAAAUINPfwAMpqTGOAEAAIBtFNVJuU0NYE0EAACAKhTVCSlkIC63ZAEAcJYDgO0U1YINMIiSGgAAAGAfRXUiSmqIS0kNAAAAsJ+iOgklNcSlpAYAAAA4RlENcICSGgDgPpdtAOc6YAtFtYAHAAAAADBV2qK6S3mrpIa4/NYdAJAfcLYDgDHcqBZkAIdMAAAAgKmWlxeFS0RKaojLmmm9BADs0wDAWG5UC3PABkpqjCMAwBkPAMZTVAOspFwEANhOSQsArKGoFuKAFZTUAAA44wHAeRTVAgwAAICzDgAwVeqiulLYEdwgLrepAQDZAuc8ADiXG9XCC+Agaf0EAOzbAMBUimphDXhASQ0AgLOeDA3ANRabieACCNgAAM5Afk4AmMmNaoBPlNQYXwBwHiUuAHBP+qI6a8gRzgAAoK/uv7isfB5y1gOAfdyoFlwAh0ZrKQBgL/czAcBUimrBBfiPkhoAwPnIzyJPAzCHolpwAYRqAED+cE5y1gOAqRTVggs4JDokAgA4LznrAcBUfxTVWcsawQDYS0mN8QYAznV7/32dReUcAMZxo1rgArCuAsAkyr2/9/gM+7wsAgDj3TwCAQYcDAEAiHiOipbXnO8A4DyKaiEGWlJSAwDkOVPNzm7OdrI1AOcr8+mPaMFBkAFBGgBANhl3vrr6jPX7n+lsBwDXuN0LSTbi44HGUwAHQayxxh4AnJcDzthbneUAYB6f/hBsoA1FIQAQOac4S4w5e63NfJ63jA1ALIpqAAAAylBAA0BOS6UfZnYgEYggLjc9AAB5BYxZAOJaPIIxlNQgQGOtBQAAAPa5W1QrdbZRnEBc1jOMQwDsGWCsAhCfG9UHKalBeAYAADkbAI4pV1RfWRwrqUF4BgCQYwAAjnOjGoAU/HIQgE6U1RibAHSz2Hz2UZiA8AzGIwAAAIxR8kb12SWykhriUgoCAHINGJMA5OPTHxspqUFwxtoLAPINxiIAjKWo3kBRAoIzAADI2gAw3u3ZZpS1nP3n2/e30ZupzZmrx7CnYG5ibAJA5nMZAMBablRDQA4iYD4AwEd++YmxB0B1impAcAYAkHvAmANgqtJFtVt4GLeCMwCA/APGGgDxPS2qbU5wHSW14EydOWGMAmCPwRgDgPV8+gMQnAEA5CEwtgCYqnxR7YYqxqrgDAAgFwEAxOZGNeAwRkh+eQMA8hHGEwB9rCqqbVZwLoUcOOQBgH0H4wiAzlrcqFYCYnwKzpgXACArgfEDQFw+/QEIzgAAMhNNx4xxA0AUq4vq7JuX23kYlw5cYMwCYB8CYwUgu6p9khvVYFERnjE3AECGwhgBgKkU1YDwDABQMEvJU8jZAGSyqaj2+Q8wFsHccPADwN6E8QAAo7lRDRdTUgvQAABXZyv5CmMAgOjaFdVKQhCgAQDkLLx7AIhlc1Ftg4P9/KLE+kLd+WH8ApBlv7Jned8AOENHtHiRYNxFCdGeAgDAddlL/pKvASAS36gGhGim84scAJDD8F4B6G1XUW3Tg22UcOAwCACR9zF7mXcJQD7V+qbFiwRmh2lPwcbqKQBAjFwmm8nVADCLT3/AyZRwwjQAQLaMprSWqwHIoVLvtLuorrARKhAxxoRpzBFjGQC+3ufsdd4PAFzBjWpgSqD2FAAAcuU3pahMDUBMVS5KLl6kG68YWwI1GM8AsGX/swd6/gDEUqGHuh3dIJVxUHNxAPMEzC/mUECRcaxad6wPAMQ4B2TeK25eYf6XCII1AACRcp7iWo4GuHKNtO/UsIwYDB4jCOXWCrrNE2MaAL7eJ33XWuYAwHl7CzeqP7xEAYDOi4FwjXkCAFyZB2UCGRqAc8/d2fYSRTUgYAMAECInKq9laADGyXYxd0hRXeVbMG5Vc3T8eAoCNj3mibENANfusV2ytowBwBnn8Cz7y+J1wZhJ7ykAAICsvZeSGsAaeuZemmE/XQyIniEIbBJYX41tAJAfYmQL+QKAq/bVyHurG9VNwxDGy9lh21MAAEDOlpsBiLnHRiyt/TFFQNjGQdP4BgDZQaYAwJ57yR71aJ8fWlRX+aOKvx+Y8ED3AC1wAwAgY8vMANiHr+DTHyBAC9yYKwAAF+RlmRng3HXWU8htMSgeU66AzQCMcwBwBjuaIeQIAHjOjWoQoMFcAQDkhhMoqAFgvVOKareqEaD7EL7pMFeMcwCQG7ZmB/kBwNmNbW4ewbrQZKCDDQAAgHPOW34m+RoATiuqf/z6+ermKQJnXUI0XeaKsQ4AMkOE5yGTAFCdG9UbAoNgYAx4CkIy5goAQJSMJZcD/M3l2byWswdG9WAAHRd8TwHjHQBwvorxDD/+zxMBIDM3qkGIBnMFAJAZCj5Xv3QHIJPl7H+AW9V453UIuhjvAIB8netZu20NOM+RxeIRCFZgkcfaCADIC/WfvecPQGSXFNUKLgTp3Mxhus0VYx4A5IXK70FpDXTgXJePG9VCFljYAQCg6bnW2RaAKC4rqiuWXTb0+qGt+zNQUtNxrhj3ACAvdHw/3hFQkfNdLm5UgyAN5goAIC+gsAZgqkuLareqIQ+/daTj+mfcA4C8gPcGOOcxhxvVNnG8T4s4AAByNX+9P+8QgCtdXlQrwBCmYzNH6TpXjH0AkBW4/y69T8B5jyu4US2IgYUb6x0AICvgvQKl6TziWwwMGzfenwUbgcX4BwBwZgJgJjeqbdx4b9B6riipAUBWYNs79p4B5z/OsBgYgPmIgycAICvgfQMd6EDicqPahu19+eSHBZq288T4BwBZAe8dgBimFtWVCwIbtveUgZIO8wQAkBXw/oFu9CExLQaGDRuLMpgDAIAzD8YB4EzITD79gTBlMQbzBAAAuRFoRz8Sy2JQ2KyFKKDbPBFGAEBWwJgAcD6MxY1qmzUWYGi1bpkDACArYGwAOCfGsxgQNmvBycIL5ggAICtgjAAwU6gb1cpqML/APAAAZxoAcF7sx6c/BDvP32IL1igAQE7AeAHa+/Hr56sOZZ4l4oDwWhCUzCnMEXMBAEC+BHB+7MONaps1FlZQUgMAzjAYOwDOkVMtBoLNWjgC88NTAABkBQD4k7L6WouBIPB5zhZTzA9zAQCQpTGOAJwpZ/LpDxs2FlGsP+YCAOCsAgBfnC2dL8+3RB8EAiCerXmDuQEAyAoYUwCz6VzOtRgANm3P1IKJuWE+AADOJgCw7qzpvHkOn/4QCCm0UHoKWGfMBwAAWRTgmnOns+dYS5YXb+PGcwTzAgCQFwAgEoX1OEumly4c4vmZH5gX5gMAyAsYZwARz6LOo8cs2V64zRv6zgusJ+YDAMgLABD9XOpsuo9vVAuLnlnyxc9bx5wwHwBAXsCYA4h3RnVO3WbJ+JJt4KCUw/oBAAAA0f0urPU4z72+veXsMdycpfOYMB4wH8wJAECmkt8A7DGV9gVFtY3c5DYWMB/MBwAAuUuOA7CfTN0D0hbVXiJdx4IxgLlgTgAAspgcB2BPqbbepy6quwYBm3nfMeDdYy6YEwCAbCbLAdhbKq7p6YvqrgHAht7v3XvnmAvmBAAgq8l0AFyx78xYn29eXd4BZ0MX3qDrwcecAAAyZheFNQDOzI8tHn5e3UNOl59fIYd5YE4AAHIMAFS3VPlBlNV+bjAPAABwdgWAnEp8o/qjzsVNp8DjNjWdWecAAOQ6GQ+AapZqP1DnDa5LyFFS4zDjAAMAIN8AQC2LR1BL9RJLSY357RAHAAAA1FOyqO5eaPjPx4xfzGtzAgBA1gGATMreqFZW1yu1OhR1Qir3xr1fPgEAOAcAQHWlP/2hrFZwQfY57NDm0AYAAAAdlP9GtZKjRtnlNjXmbT/mBAAg+wBAHy3+mKINP3fppaTGfHVQAwAAAGq7eQR9/C6/FECxeB98nqPmhDkBAAAA3SxdflDFx7tMZVj14s64pMtYNycAAGQhWRiAryydflgFSK4goKSmy1wUzM0JAAAA6G7p9gMrQt4pyIxD5s9BTwEAAACgYVH98qIk/CxiWabAw7yzLgMAAAB9LF1/cKXInyLdrvbJD8w16zEAAADQy9L5h1eO/E2BZsxhfpkTAAAAwNVe3970Jsqjv80qjyq/C4WcNQZzAgB7vb0c48lYAuC+xSOwKT4KR1cHJCU15pF1FwAAAOhJUf0fpcl9ijZji/1zx1MwJwAAAIB1FNUfKE8eO7t0U+pRaa4Yz9ZZAADnIgDYRlH9iRLl69AkOBlPOFiYDwCA7AMAjKaovkOZcm0grRpwjaNec8JBzXwAAAAA9lNUP6BU+dqoYk5JjXlgPQUAwA11AFBUf0G5si5MCVTGjXGP+QAAfXORpwAAjKCofkLJsj6gbg2pFUOt8WKcYz4AYM+DPTnTUwCgO0W14Dk8YK0JWYIYDg/WTQBATgK5EYDfFNU2T2HVGOHJWHb4MhcAAJydAOBciuoNlC/bA9e90OWTH2Qev5gLAMD97OQpeG4AcISieiMlzL7w9TuAKanJNF4xFwCAbTnKUwAA9np9e5MlhDD2UsyZz5gLACBTyAXGi7ECwHFuVNtQMQZaHw4cEMwFAGB8xvIUPCMA2OrmEez349fPVwEDHAw6r4GeAgDwKG/JCnIoAGzhRvVBwpf3Tq6DgcOBOQAAyF6znoenAACP+Ua10MFGCjpz0xwwBwBA9pAfjAljAoCxfPpj8CYrhAhTOBCYAwAA97NZtywhkwLAem5UCyOspKAz98wBcwAA5BG5wjjw/gE4h6JaMEGQMtcwBwBAPpEzvHfvHICpfPrjxI1XUAEHAYcIAID1uS5b9pBJAWAcN6oFF55Q1JlPxj4AILfII96rjAnAudyovmgTFmiEKBwEjH0AgON58KqcIosCwLXcqJ4csohLUWeeGPsAgEwDciYA11BUC6wIUOYExj0AyDkgbwIwlU9/TNiYBVbhyYEN4x4AAHkTAN4pqidu0Ao7OjDOHRoAoPMeKwsBAKzj0x+TCa7xDhOegvFsvAMAMhLInQBcy43qABu24Co8OWxhvAMAIHcC0Jkb1YEo/4Qn4xHjHQBkK5A9AejIjepgG7gAKzg5IGGsAwAgfwLQjRvVQSkUBSdjAYcEAJDxQf4EoIvFI7Cpe8YOM9Qe59YTAJA/AQCiU1QHD7LCbF9KahyGAQCQQwHowqc/klBa9gpO3jcOBgAg24MsCkAnimqhVnDyjjG+AQCZD2RRAKby6Q8bv+fnwEKRsW19AAC5FAAgK0V10lAr2DoMgLENAPZwMJ4BqEJRLQh4VkG4Tc2ecW0dAADAeQuAChTVBQKBUJCfkhqHAQCwp4MxDEBn/phiMQrPfMHJO8NBAACQCZFNAehOUS3kCk7eFcYyACAbgnwKwFSKakFXcPJ+MJYBABkR5FMAplJUC7uCk/eCcQwAyIkgowIwlaJa4BWcvAuMYQBAXgQZFYCpFNUCrwDlHWDsAgCyI8ipAEylqBZ4BSjPHeMWAJAhQVYFYCpFtdBbZgAoqTFuAQC5HWRVAHJSVFMi+CqpMWYBAJkdZFUA8lJUkz78KqkxXgEAmR3kVQByu3kEZA68QhTGKgDQMVcoq5FXAahGUQ0ncoBA4AcAzswY8iYyKwBV+PQHL1kDrk9+YHwCAMidyKwA1KCoRkntmSLoAwByPbIrAEzl0x8IVA4ICPkAQKFMIo8iuwKQkRvVzWULsUpqjEcAANkU2RWAetyoFlwFKzAOAYDCuUVhbRx4CgBkoKiGQRwABHwAgMg5Rl6VXwEgMp/+aMpt6t7PE+EeAHAWQH4FgEgU1YKpsCXoI+ADAM4FyK8AMJVPfyBwCfcI9wBA8/wj18qwADCbG9XNZAqgSmoEewAAGRcZFoAe3KgWOoUvBHsAAO5mJcW1DAsAV1FUI4TtILAbUwAA3XKUDCy/AsCZFNVNCJWepXAPAMDIfCUXy68AMJJvVDfgkx89n6VwDwCArCy7AkAWblQjqAnexgwAAKdkMxlabgWAtdyoLi5LMFRSI+ADADinyKsA0Jcb1QhzTUO0sQEAQOScFzGHy6cAcB5FdWEZClZBD+MBAADZEABQVBflFrDn6OABAAAAQBaKaqZRVHrXAAAAAPDy4o8pluSTH56xdwoAAABAJorqYpTU3oP3BgAAAEA2Pv3BpbqUnVt/zhnFtuIZAAAAgCjcqC4k+i1exSgAAAAAcM/iEdTgm8kAAAAAQFaKai7hNjUAAAAA8IiiugCf/AAAAAAAMlNUJ6ekBgAAAACyU1RzGiU1AAAAALCGojqxyLepldQAAAAAwFqK6qSif/IDAAAAAGAtRTXDuU0NAAAAAGyhqE7IJz8AAAAAgEoU1ckoqQEAAACAahTVDKGkBgAAAAD2UlQnEvU2tZIaAAAAADhCUZ1E5E9+AAAAAAAcoajmELepAQAAAICjFNUJ+OQHAAAAAFCZoppdlNQAAAAAwCiK6uAi3qZWUgMAAAAAIymqA1NSAwAAAAAdKKpZTUkNAAAAAJxBUR1U1D+gCAAAAAAwmqI6IJ/8AAAAAAA6UVTzlJIaAAAAADiTojqYaLepldQAAAAAwNkU1YEoqQEAAACAjhTV3KWkBgAAAACuoqgOIuIfUAQAAAAAuIKiOgCf/AAAAAAAOlNU8wclNQAAAABwNUX1ZJFuUyupAQAAAIAZFNUTKakBAAAAABTVvCipAQAAAIC5FNWTRPsDigAAAAAAsyiqm3ObGgAAAACY7X+ftvicDKND/QAAAABJRU5ErkJggg==\" alt=\"Light\"></div>';document.body.appendChild(energyFX);
+function playEnergyLogo(){if(reduce)return;energyFX.classList.remove('active');void energyFX.offsetWidth;energyFX.classList.add('active');setTimeout(()=>energyFX.classList.remove('active'),1540)}
+function activate(n,dir=1,first=false){n=Math.max(0,Math.min(S.length-1,n));if((n===a&&!first)||busy)return;const old=S[a],next=S[n],deck=document.querySelector('.deck');busy=!reduce&&!first;if(!reduce&&!first)playEnergyLogo();if(!reduce&&!first&&deck){deck.classList.remove('transitioning');void deck.offsetWidth;deck.classList.add('transitioning');setTimeout(()=>deck.classList.remove('transitioning'),1380)}if(!first&&old){old.classList.remove('enter-left','enter-right','settled');old.classList.add(dir>0?'exit-left':'exit-right')}next.classList.remove('exit-left','exit-right');next.classList.add('on',dir>0?'enter-right':'enter-left');a=n;c.textContent=(a+1)+' / '+S.length;pb.style.width=((a+1)/S.length*100)+'%';requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('settled')));setTimeout(()=>{S.forEach((slide,i)=>{if(i!==a)slide.classList.remove('on','settled','enter-left','enter-right','exit-left','exit-right')});next.classList.remove('enter-left','enter-right','exit-left','exit-right');next.classList.add('on','settled');busy=false},reduce||first?0:1450)}
 function go(n){activate(n,n>a?1:-1)}
 function toggleFull(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
 document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(a+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(a-1)}if(e.key==='Home')activate(0,-1);if(e.key==='End')activate(S.length-1,1);if(e.key.toLowerCase()==='f')toggleFull()});
@@ -1203,7 +1375,7 @@ let touchX=0;document.addEventListener('touchstart',e=>touchX=e.changedTouches[0
   await pptx.writeFile({fileName:safeName});
  }catch(err){console.error(err);alert('Não foi possível concluir o PowerPoint. Abra o arquivo no Microsoft Edge atualizado e tente novamente.')}finally{activate(active,1,true);btn.disabled=false;btn.textContent='Baixar PPT'}
 }
-S.forEach(slide=>slide.classList.remove('on'));activate(0,1,true);`;
+S.forEach(slide=>{slide.classList.remove('on');if(!slide.classList.contains('cover')){const beams=document.createElement('span');beams.className='energy-beams';slide.appendChild(beams)}});activate(0,1,true);`;
         const finalHtml =
           '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Apresentação Gerencial Semanal de Pré e Pós-Operação</title><style>' +
           css +
