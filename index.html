@@ -1,293 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Top 10 CHI e Compensação Financeira | Logo oficial aplicada</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Registro de Equipamento - MIC</title>
 <style>
-:root{
-  --verde:#00998F;
-  --verde-hover:#007D75;
-  --verde-escuro:#14332D;
-  --texto:#494848;
-  --texto-suave:#6E7775;
-  --fundo:#F4F6F5;
-  --superficie:#FFFFFF;
-  --linha:#D8E5E3;
-  --verde-suave:#EAF6F4;
-  --cinza-suave:#F7F9F8;
-  --alerta:#C62828;
-  --alerta-escuro:#991B1B;
-  --alerta-suave:#FDECEC;
-  --sucesso:#087A55;
-  --atencao:#D97706;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--fundo);font-family:Arial,"Segoe UI",sans-serif;color:var(--texto);font-size:14px}
-button,textarea{font:inherit}
-.wrap{max-width:1480px;margin:auto;padding:0 20px 32px}
-.panel{background:var(--superficie);border:1px solid var(--linha);border-radius:18px;box-shadow:0 8px 24px rgba(20,51,45,.06)}
-.head{display:flex;justify-content:space-between;align-items:center;gap:24px;min-height:100px;margin:0 -20px;padding:18px max(24px,calc((100vw - 1440px)/2));border:0;border-bottom:5px solid var(--verde);border-radius:0;background:#fff}
-.brand{display:flex;align-items:center;gap:18px;min-width:0}
-.logo-light{display:block;width:96px;height:82px;object-fit:contain;object-position:center;flex:0 0 auto}
-.eyebrow{color:var(--verde);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
-h1,h2,h3{margin:4px 0;color:var(--verde-escuro)}
-h1{font-size:25px;line-height:1.15;font-weight:700;letter-spacing:-.3px}
-h2{font-size:22px;font-weight:700}
-.muted{color:var(--texto-suave)}
-.head .muted{font-size:13px;margin-top:5px}
-.pill{display:inline-flex;align-items:center;padding:8px 13px;border:1px solid #B9DDD8;border-radius:999px;background:var(--verde-suave);color:var(--verde-escuro);font-size:11px;font-weight:700;white-space:nowrap}
-.head>.pill{background:#fff}
-.input{position:relative;margin-top:24px;padding:24px 30px;overflow:hidden}
-.input::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,var(--verde-escuro),var(--verde))}
-.input p{line-height:1.5}
-textarea{width:100%;height:160px;padding:14px;border:1px solid #BFD5D2;border-radius:12px;background:#fff;color:var(--texto);font-family:Consolas,monospace;font-size:12px;resize:vertical}
-textarea:focus{outline:3px solid rgba(0,153,143,.14);border-color:var(--verde)}
-.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-button{border:0;border-radius:999px;padding:11px 19px;background:#EDF3F2;color:var(--verde-escuro);font-weight:700;cursor:pointer;transition:.18s ease}
-button:hover{transform:translateY(-1px);background:#E1EBE9}
-button:disabled{cursor:not-allowed;opacity:.65;transform:none}
-.primary{background:var(--verde);color:#fff}
-.primary:hover{background:var(--verde-hover)}
-.msg{margin-top:11px;color:var(--sucesso);font-weight:700;white-space:pre-line}.input-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0}.input-tools label{font-weight:700;color:var(--verde-escuro)}select{margin-left:7px;padding:9px 12px;border:1px solid #BFD5D2;border-radius:999px;background:#fff;color:var(--texto)}.file-button{display:inline-flex;align-items:center;padding:10px 16px;border-radius:999px;background:#EDF3F2;cursor:pointer}.file-button:hover{background:#E1EBE9}
-.error{color:var(--alerta)}
-.dash{display:none;margin-top:18px;padding:26px 30px}
-.capture-panel{background:#fff}
-.title{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:13px;border-bottom:2px solid var(--linha)}
-.title h2{font-size:30px;line-height:1.1}
-.title .muted{font-size:15px}
-.summary{margin:14px 0 16px;padding:14px 17px;border:1px solid #CEE5E1;border-left:5px solid var(--verde);border-radius:11px;background:var(--verde-suave);font-size:15px;line-height:1.45}
-.summary b{color:var(--verde-escuro)}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 16px}
-.kpi{position:relative;min-height:132px;padding:16px 18px 14px;border:1px solid var(--linha);border-top:4px solid var(--verde);border-radius:12px;background:#fff;overflow:hidden}
-.kpi.alert{border-top-color:var(--alerta)}
-.kl{color:var(--texto);font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-.kv{margin:10px 0 6px;color:var(--verde-escuro);font-size:31px;line-height:1.05;font-weight:900}
-.kpi.alert .kv{color:var(--alerta-escuro)}
-.ks{min-height:21px;color:var(--texto-suave);font-size:12px;line-height:1.35}
-.status{display:inline-block;margin-top:5px;padding:4px 8px;border-radius:5px;font-size:9px;font-weight:900;letter-spacing:.06em}.status.danger{border:1px solid #F0C5C5;background:var(--alerta-suave);color:var(--alerta-escuro)}.status.success{border:1px solid #BFE3D3;background:#EAF8F2;color:var(--sucesso)}.status.warning{border:1px solid #F3D5A4;background:#FFF7E8;color:var(--atencao)}.status.neutral{border:1px solid #D8E5E3;background:#F4F6F5;color:var(--texto-suave)}.kpi.danger{border-top-color:var(--alerta)}.kpi.danger .kv{color:var(--alerta-escuro)}.kpi.success{border-top-color:var(--sucesso)}.kpi.warning{border-top-color:var(--atencao)}.kpi.warning .kv{color:#A75A05}.empty-row td{text-align:center!important;color:var(--texto-suave);padding:28px!important}.critical{display:inline-block;margin-top:5px;padding:4px 8px;border:1px solid #F0C5C5;border-radius:5px;background:var(--alerta-suave);color:var(--alerta-escuro);font-size:9px;font-weight:900;letter-spacing:.06em}
-.card{width:100%;border:1px solid var(--linha);border-radius:14px;background:#fff;overflow:hidden}
-.cardhead{padding:15px 18px 12px;border-bottom:1px solid var(--linha);background:#fff}
-.cardhead h3{font-size:21px;font-weight:700}
-.cardhead .muted{font-size:13px}
-.cardhead::after{content:"";display:block;width:45px;height:3px;margin-top:9px;border-radius:5px;background:var(--verde)}
-.tablewrap{overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{padding:10px;background:var(--verde-escuro);color:#fff;font-size:12px;text-align:left;white-space:nowrap}
-td{padding:9px 10px;border-bottom:1px solid #E5ECEA;line-height:1.25}
-tr:nth-child(even) td{background:var(--cinza-suave)}
-tr:hover td{background:#EEF7F5}
-.num{text-align:right;white-space:nowrap}
-.rank{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:7px;background:var(--verde);color:#fff;font-size:13px;font-weight:900}
-.bad{color:var(--alerta-escuro);font-weight:800}
-.good{color:var(--sucesso);font-weight:800}
-.voltage{display:inline-block;min-width:36px;padding:4px 8px;border-radius:999px;text-align:center;font-size:11px;font-weight:900}
-.voltage.mt{background:#DCF2EF;color:var(--verde-escuro)}
-.voltage.bt{background:#EDF1F0;color:var(--texto)}
-.voltage.other{background:#E8EAE9;color:#5C6361}
-.foot{display:flex;justify-content:space-between;gap:16px;margin-top:12px;padding-top:9px;border-top:1px solid var(--linha);color:var(--texto-suave);font-size:11px}
-.exporting button{pointer-events:none;opacity:.65}
-.ppt-stage{position:fixed;left:-100000px;top:0;width:1888px;height:900px;padding:0;background:#fff;overflow:hidden;font-family:Arial,"Segoe UI",sans-serif}
-.ppt-stage .ppt-frame{position:absolute;inset:0;width:1888px;height:900px}
-.ppt-stage #capture{width:1888px!important;height:900px!important;min-height:900px!important;padding:8px 14px 6px!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;background:#fff!important}
-.ppt-stage #capture .title{flex:0 0 auto!important;padding:0 0 5px!important}
-.ppt-stage #capture .title h2{margin:0 0 4px!important;font-size:38px!important;line-height:1!important}
-.ppt-stage #capture .title .muted{font-size:17px!important;line-height:1.1!important}
-.ppt-stage #capture .title>.pill{padding:9px 15px!important;font-size:16px!important}
-.ppt-stage #capture .summary{flex:0 0 auto!important;margin:6px 0 7px!important;padding:10px 16px!important;font-size:17px!important;line-height:1.2!important}
-.ppt-stage #capture .kpis{flex:0 0 112px!important;height:112px!important;gap:10px!important;margin:0 0 7px!important}
-.ppt-stage #capture .kpi{height:112px!important;min-height:112px!important;padding:11px 16px 8px!important}
-.ppt-stage #capture .kl{font-size:15px!important;line-height:1.05!important}
-.ppt-stage #capture .kv{margin:6px 0 3px!important;font-size:36px!important;line-height:1!important}
-.ppt-stage #capture .ks{min-height:15px!important;font-size:14px!important;line-height:1.08!important}
-.ppt-stage #capture .status,.ppt-stage #capture .critical{margin-top:2px!important;padding:3px 7px!important;font-size:10px!important}
-.ppt-stage #capture .card{flex:1 1 auto!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
-.ppt-stage #capture .cardhead{flex:0 0 62px!important;height:62px!important;padding:8px 17px 6px!important;overflow:hidden!important}
-.ppt-stage #capture .cardhead h3{margin:0 0 3px!important;font-size:25px!important;line-height:1.05!important}
-.ppt-stage #capture .cardhead .muted{font-size:14px!important;line-height:1.05!important}
-.ppt-stage #capture .cardhead::after{height:2px!important;margin-top:4px!important}
-.ppt-stage #capture .tablewrap{flex:1 1 auto!important;min-height:0!important;display:block!important;overflow:hidden!important}
-.ppt-stage #capture table{width:100%!important;height:auto!important;border-collapse:collapse!important;font-size:15px!important;table-layout:fixed!important}
-.ppt-stage #capture thead,.ppt-stage #capture thead tr{height:34px!important}
-.ppt-stage #capture tbody{height:auto!important}
-.ppt-stage #capture tbody tr{height:48px!important}
-.ppt-stage #capture th{height:34px!important;padding:5px 9px!important;font-size:14px!important;line-height:1!important;vertical-align:middle!important}
-.ppt-stage #capture th:nth-child(1){width:7%!important}
-.ppt-stage #capture th:nth-child(2){width:21%!important}
-.ppt-stage #capture th:nth-child(3){width:10%!important}
-.ppt-stage #capture th:nth-child(4){width:29%!important}
-.ppt-stage #capture th:nth-child(5),.ppt-stage #capture th:nth-child(6),.ppt-stage #capture th:nth-child(7){width:11%!important}
-.ppt-stage #capture .tablewrap{background:linear-gradient(#fff,#fff)!important}
-.ppt-stage #capture td{padding:3px 9px!important;font-size:15px!important;line-height:1.02!important;vertical-align:middle!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important}
-.ppt-stage #capture td .muted{margin-top:1px!important;font-size:12px!important;line-height:1!important}
-.ppt-stage #capture .rank{width:29px!important;height:29px!important;font-size:13px!important}
-.ppt-stage #capture .voltage{min-width:34px!important;padding:3px 7px!important;font-size:11px!important}
-.ppt-stage #capture .foot{flex:0 0 22px!important;height:22px!important;margin:3px 0 0!important;padding:4px 0 0!important;font-size:11px!important;line-height:1!important;overflow:hidden!important}
-.committee-switch{display:none;margin-top:18px;padding:18px 24px}.committee-switch .switch-title{font-size:13px;font-weight:900;color:var(--verde-escuro);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.committee-switch .buttons{margin:0}.committee-switch button.active{background:var(--verde);color:#fff}.committee-note{margin-top:10px;color:var(--texto-suave);font-size:12px}.weekly-filter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid var(--linha)}.weekly-filter label{font-weight:900;color:var(--verde-escuro);text-transform:uppercase;font-size:12px;letter-spacing:.04em}.weekly-filter select{min-width:255px}.manager-buttons button{border-radius:10px;padding:10px 14px}.manager-buttons button.active{background:var(--verde);color:#fff}
-@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:650px){.wrap{padding:0 8px 20px}.head{margin:0 -8px;padding:16px;align-items:flex-start}.brand,.head,.title{flex-direction:column}.brand{align-items:flex-start}.logo-light{width:82px;height:70px}.input,.dash{padding:18px}.kpis{grid-template-columns:1fr}.foot{flex-direction:column}.title h2{font-size:24px}}
-@media print{.input,.buttons{display:none!important}.dash{display:block!important}.panel{box-shadow:none}}
+:root{--turquesa:#079b96;--turquesa-escuro:#087b77;--laranja:#f47718;--verde-escuro:#123c34;--branco:#fff;--fundo:#edf7f5;--texto:#161616;--borda:#c8ded9;--vermelho:#b42318}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Segoe UI",sans-serif;background:var(--turquesa);color:var(--texto)}
+header{max-width:1120px;margin:28px auto 0;padding:30px 34px;background:var(--verde-escuro);color:#fff;border-radius:26px 26px 8px 8px;position:relative;overflow:hidden}
+header:after{content:"MIC";position:absolute;right:26px;top:12px;font-size:82px;font-weight:900;color:#ffffff12;line-height:1}
+header h1{position:relative;margin:0 0 8px;font-size:31px;text-transform:uppercase;letter-spacing:.3px;color:#fff}header h1:before{content:"";display:inline-block;width:13px;height:31px;background:var(--laranja);border-radius:4px;margin-right:13px;vertical-align:-5px}header p{position:relative;margin:0 0 0 28px;font-size:16px;opacity:.94}
+main{max-width:1120px;margin:0 auto;padding:20px 0 42px}.card{background:#fff;border:0;border-radius:24px;padding:28px 32px;margin-bottom:20px;box-shadow:0 7px 20px #064f4b30}
+h2{font-size:21px;color:var(--laranja);margin:0 0 20px;text-transform:uppercase;font-weight:900;border-bottom:3px solid var(--turquesa);padding-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.full{grid-column:1/-1}
+label{display:block;font-weight:800;font-size:14px;margin-bottom:7px;color:var(--verde-escuro)}input,select{width:100%;border:2px solid var(--borda);border-radius:10px;padding:12px 13px;font:inherit;background:#fff;color:var(--texto)}input:focus,select:focus{outline:4px solid #079b9628;border-color:var(--turquesa)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}button{border:0;border-radius:9px;padding:11px 18px;font-weight:800;cursor:pointer;transition:.15s}button:hover{filter:brightness(.95);transform:translateY(-1px)}.primary{background:var(--laranja);color:#fff}.secondary{background:var(--turquesa);color:#fff}.danger{background:#fee4e2;color:var(--vermelho)}
+.msg{display:none;margin-top:14px;padding:12px;border-radius:9px;font-weight:700}.ok{display:block;background:#dff5e9;color:#08613b}.erro{display:block;background:#fee4e2;color:var(--vermelho)}
+.toolbar{display:flex;gap:12px;align-items:end;justify-content:space-between;flex-wrap:wrap}.search{min-width:240px;flex:1;max-width:450px}.table-wrap{overflow:auto;margin-top:18px;border:1px solid var(--borda);border-radius:12px}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:13px 11px;border-bottom:1px solid #d8e8e4;text-align:left;font-size:13px}th{background:var(--verde-escuro);color:#fff;text-transform:uppercase;font-size:12px}tbody tr:nth-child(even){background:#f1faf8}.badge{display:inline-block;padding:5px 9px;border-radius:99px;background:var(--laranja);color:#fff;font-weight:800}.empty{text-align:center;color:#667085;padding:28px}.note{display:block;color:#5d6f6b;margin-top:10px}
+footer{max-width:1120px;margin:0 auto 30px;color:#fff;padding:0 12px;font-weight:800;font-size:18px}footer span{font-weight:400;font-size:14px;margin-left:8px}
+@media(max-width:1150px){header,main,footer{margin-left:16px;margin-right:16px}}@media(max-width:650px){header{padding:24px 20px}header h1{font-size:23px}header p{margin-left:0}.card{padding:22px 18px}.grid{grid-template-columns:1fr}.full{grid-column:auto}}@media print{body{background:#fff}header,.form-card,.toolbar,.acoes,footer{display:none!important}.card{border:0;box-shadow:none}main{max-width:none;margin:0;padding:0}}
 </style>
 </head>
 <body>
-<main class="wrap">
-<header class="panel head">
-  <div class="brand"><img class="logo-light" src="data:image/png;base64,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" alt="Logo Light"><div><div class="eyebrow">Light • Coordenação Pré e Pós-Operação</div><h1>Acompanhamento de CHI e Compensação Financeira</h1><div class="muted">Top 10 de impactos para decisão do Comitê de Pré-Operação</div></div></div>
-  <span class="pill">Painel interno</span>
-</header>
-<section class="panel input">
-  <h2>Colar dados da planilha</h2>
-  <p class="muted">Cole dados do Excel ou carregue um arquivo CSV/TXT. O sistema aceita TAB, ponto e vírgula e vírgula, respeitando campos entre aspas.</p>
-  <div class="input-tools">
-    <label>Formato das datas
-      <select id="dateFormat" aria-label="Formato das datas">
-        <option value="auto">Automático</option>
-        <option value="dmy">DD/MM/AAAA</option>
-        <option value="mdy">MM/DD/AAAA</option>
-      </select>
-    </label>
-    <label class="file-button" for="fileInput">Selecionar CSV/TXT</label>
-    <input id="fileInput" type="file" accept=".csv,.txt,text/csv,text/plain" hidden>
-    <span id="fileName" class="muted">Nenhum arquivo selecionado</span>
-  </div>
-  <textarea id="input" placeholder="Cole o cabeçalho e os registros separados por TAB..."></textarea>
-  <div class="buttons"><button id="generateBtn" class="primary" onclick="generate()">Gerar Top 10</button><button onclick="clearAll()">Limpar</button></div>
-  <div id="msg" class="msg" role="status" aria-live="polite"></div>
-</section>
-<section id="committeeSwitch" class="panel committee-switch">
-  <div class="weekly-filter">
-    <label for="weekSelect">Visão semanal</label>
-    <select id="weekSelect" onchange="setWeek(this.value)" aria-label="Selecionar semana"></select>
-  </div>
-  <div class="switch-title">Selecione a gerência</div>
-  <div class="buttons manager-buttons">
-    <button id="btnEXP" class="primary active" onclick="setArea('EXP')">Gerência de Expansão | EXP-</button>
-    <button id="btnMAN_BX_OE" onclick="setArea('MAN_BX_OE')">Manutenção BX/OE | MAN-BX e MAN-OE</button>
-    <button id="btnMAN_LE_VP" onclick="setArea('MAN_LE_VP')">Manutenção LE/VP | MAN-LE e MAN-VP</button>
-    <button id="btnMAN_CS_SO" onclick="setArea('MAN_CS_SO')">Manutenção CS/SO | MAN-BA e MAN-CS</button>
-  </div>
-  <div id="committeeNote" class="committee-note"></div>
-</section>
-<section id="dashCHI" class="panel dash">
- <div id="captureCHI" class="capture-panel">
-  <div class="title"><div><h2 id="titleCHI">Visão executiva | CHI</h2><div id="subtitleCHI" class="muted">Casos executados acima do planejado</div></div><span id="periodCHI" class="pill">Período: —</span></div>
-  <div id="summaryCHI" class="summary"></div>
-  <div class="kpis">
-   <div class="kpi"><div class="kl">CHI planejado</div><div id="chiPlan" class="kv">0</div><div class="ks">Base total planejada</div></div>
-   <div id="chiExecCard" class="kpi"><div class="kl">CHI executado</div><div id="chiExec" class="kv">0</div><div id="chiExecSub" class="ks"></div><span id="chiStatus" class="status neutral">AGUARDANDO</span></div>
-   <div id="chiDeltaCard" class="kpi"><div class="kl">Desvio de CHI</div><div id="chiDelta" class="kv">0</div><div id="chiDeltaSub" class="ks"></div></div>
-   <div class="kpi"><div class="kl">Maior CHI executado</div><div id="chiMax" class="kv">0</div><div id="chiMaxSub" class="ks"></div><span class="critical">TOP 1</span></div>
-  </div>
-  <article class="card"><div class="cardhead"><h3 id="rankTitleCHI">Top 10 | Variação positiva de CHI</h3><div class="muted">Somente PIs com CHI executado acima do planejado</div></div><div class="tablewrap"><table><thead><tr><th>#</th><th>PI / Responsável</th><th>Tensão</th><th>Conjunto crítico</th><th class="num">Plan.</th><th class="num">Exec.</th><th class="num">Variação</th></tr></thead><tbody id="chiBody"></tbody></table></div></article>
-  <div class="foot"><span>Light • Fonte: planilha de programação</span><span id="stampCHI"></span></div>
- </div>
- <div class="buttons" style="justify-content:flex-end"><button class="primary" onclick="pngCHI()">Baixar visão CHI | PNG HD</button></div>
-</section>
-<section id="dashFIN" class="panel dash">
- <div id="captureFIN" class="capture-panel">
-  <div class="title"><div><h2 id="titleFIN">Visão executiva | Compensação financeira</h2><div id="subtitleFIN" class="muted">Priorização dos casos de maior valor executado</div></div><span id="periodFIN" class="pill">Período: —</span></div>
-  <div id="summaryFIN" class="summary"></div>
-  <div class="kpis">
-   <div class="kpi"><div class="kl">Compensação planejada</div><div id="finPlan" class="kv">R$ 0,00</div><div class="ks">Base total planejada</div></div>
-   <div id="finExecCard" class="kpi"><div class="kl">Compensação executada</div><div id="finExec" class="kv">R$ 0,00</div><div id="finExecSub" class="ks"></div><span id="finStatus" class="status neutral">AGUARDANDO</span></div>
-   <div class="kpi"><div class="kl">Custo não planejado</div><div id="finUnplanned" class="kv">R$ 0,00</div><div id="finUnplannedSub" class="ks"></div></div>
-   <div class="kpi"><div class="kl">Maior compensação</div><div id="finMax" class="kv">R$ 0,00</div><div id="finMaxSub" class="ks"></div><span class="critical">TOP 1</span></div>
-  </div>
-  <article class="card"><div class="cardhead"><h3 id="rankTitleFIN">Top 10 | Compensação financeira</h3><div class="muted">Ranking pela maior compensação executada</div></div><div class="tablewrap"><table><thead><tr><th>#</th><th>PI / Responsável</th><th>Tensão</th><th>Conjunto crítico</th><th class="num">Plan.</th><th class="num">Exec.</th><th class="num">Variação</th></tr></thead><tbody id="finBody"></tbody></table></div></article>
-  <div class="foot"><span>Light • Fonte: planilha de programação</span><span id="stampFIN"></span></div>
- </div>
- <div class="buttons" style="justify-content:flex-end"><button class="primary" onclick="pngFIN()">Baixar visão financeira | PNG HD</button></div>
-</section>
+<header><h1>Registro de Equipamento para Aplicação de MIC</h1><p>Controle de equipamento removido durante a aplicação do MIC.</p></header>
+<main>
+<section class="card form-card"><h2>Dados do registro</h2>
+<form id="form">
+<div class="grid">
+<div><label for="mic">Número do MIC *</label><input id="mic" required placeholder="Ex.: MIC-12345"></div>
+<div><label for="data">Data da aplicação *</label><input id="data" type="date" required></div>
+<div class="full"><label for="intervencao">Tipo de intervenção *</label><select id="intervencao" required><option value="">Selecione</option><option>Remoção</option><option>Substituição</option><option>Alteração</option></select></div>
+</div>
+<h2 style="margin-top:22px">Equipamento removido</h2>
+<div class="grid">
+<div><label for="tipo">Tipo *</label><select id="tipo" required><option value="">Selecione</option><option>Aux</option><option>GMD</option></select></div>
+<div><label for="numero">Número do equipamento *</label><input id="numero" required placeholder="Informe o número"></div>
+</div>
+<input id="editId" type="hidden">
+<div class="actions"><button class="primary" type="submit">Salvar registro</button><button class="secondary" id="limpar" type="button">Limpar</button></div>
+<div id="msg" class="msg" aria-live="polite"></div><small class="note">Os registros ficam salvos neste navegador e podem ser exportados para CSV.</small>
+</form></section>
+<section class="card"><h2>Registros realizados</h2><div class="toolbar"><div class="search"><label for="busca">Pesquisar</label><input id="busca" placeholder="MIC ou número do equipamento"></div><div class="actions"><button class="secondary" id="csv" type="button">Exportar CSV</button><button class="danger" id="apagar" type="button">Apagar todos</button></div></div>
+<div class="table-wrap"><table><thead><tr><th>MIC</th><th>Data</th><th>Intervenção</th><th>Tipo</th><th>Número</th><th class="acoes">Ações</th></tr></thead><tbody id="tabela"></tbody></table></div></section>
 </main>
+<footer>Light <span>Prontos e Energizados</span></footer>
 <script>
-'use strict';
-let rows=[];
-let activeArea='EXP';
-let activeWeek='all';
-let availableWeeks=[];
-const $=id=>document.getElementById(id);
-const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ');
-const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const isFilled=value=>String(value??'').trim()!=='';
-function num(value){
- const original=String(value??'').trim(); if(!original)return 0;
- const negative=/^\(.*\)$/.test(original)||/^\s*-/.test(original);
- let s=original.replace(/[()]/g,'').replace(/R\$/gi,'').replace(/[^0-9,.-]/g,'').replace(/-/g,''); if(!s)return 0;
- const comma=s.lastIndexOf(','),dot=s.lastIndexOf('.');
- // O CSV exportado utiliza ponto como separador decimal, inclusive com 3 casas (ex.: 45.751 = 45,751).
- // Com os dois separadores presentes, o último é considerado decimal e o anterior, milhar.
- if(comma>=0&&dot>=0){if(comma>dot)s=s.replace(/\./g,'').replace(',','.');else s=s.replace(/,/g,'');}
- else if(comma>=0){const parts=s.split(',');s=parts.length>2?parts.slice(0,-1).join('')+'.'+parts.at(-1):parts[0]+'.'+(parts[1]||'0');}
- else if(dot>=0){const parts=s.split('.');s=parts.length>2?parts.slice(0,-1).join('')+'.'+parts.at(-1):s;}
- const n=Number(s); return Number.isFinite(n)?(negative?-n:n):0;
-}
-const money=x=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(x);
-const nfmt=x=>new Intl.NumberFormat('pt-BR',{maximumFractionDigits:3}).format(x);
-const pct=(e,p)=>p?(e-p)/p*100:(e?null:0);
-const pf=x=>x===null?'Não planejado':`${x>0?'+':''}${x.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}%`;
-const moneyDelta=x=>x>0?`+ ${money(x)}`:x<0?`- ${money(Math.abs(x))}`:money(0);
-function detectDelimiter(text){const first=(text.split(/\r?\n/)[0]||'');const candidates=['\t',';',','];return candidates.map(d=>({d,n:parseDelimited(first,d)[0]?.length||0})).sort((a,b)=>b.n-a.n)[0].d;}
-function parseDelimited(text,delimiter){const data=[];let row=[],field='',quoted=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(ch==='"'){if(quoted&&next==='"'){field+='"';i++;}else quoted=!quoted;}else if(ch===delimiter&&!quoted){row.push(field);field='';}else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&next==='\n')i++;row.push(field);if(row.some(v=>v.trim()!==''))data.push(row);row=[];field='';}else field+=ch;}row.push(field);if(row.some(v=>v.trim()!==''))data.push(row);return data;}
-function parseDate(value){const s=String(value??'').trim();if(!s)return null;let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?$/i);if(m){let a=+m[1],b=+m[2],y=+m[3],h=+(m[4]||0),mi=+(m[5]||0),sec=+(m[6]||0),ap=(m[7]||'').toUpperCase(),day,month;const mode=$('dateFormat').value;if(ap||mode==='mdy'){month=a-1;day=b;}else if(mode==='dmy'){day=a;month=b-1;}else if(a>12){day=a;month=b-1;}else if(b>12){month=a-1;day=b;}else{day=a;month=b-1;}if(ap==='PM'&&h<12)h+=12;if(ap==='AM'&&h===12)h=0;const d=new Date(y,month,day,h,mi,sec);return d.getFullYear()===y&&d.getMonth()===month&&d.getDate()===day?d:null;}m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return null;const d=new Date(+m[1],+m[2]-1,+m[3]);return Number.isNaN(d.getTime())?null:d;}
-function period(values){const dates=values.map(parseDate).filter(Boolean).sort((a,b)=>a-b);if(!dates.length)return'Período não identificado';const f=d=>d.toLocaleDateString('pt-BR'),a=dates[0],b=dates.at(-1);return a.toDateString()===b.toDateString()?`Período: ${f(a)}`:`Período: ${f(a)} a ${f(b)}`;}
-function ix(headers,...names){return headers.findIndex(v=>names.some(n=>v===norm(n)||v.includes(norm(n))));}
-function message(text,error=false){$('msg').textContent=text;$('msg').className='msg'+(error?' error':'');$('msg').setAttribute('role',error?'alert':'status');}
-function setStatus(cardId,statusId,kind,text){const card=$(cardId),status=$(statusId);card.classList.remove('danger','success','warning');card.classList.add(kind);status.className=`status ${kind}`;status.textContent=text;}
-async function generate(){const btn=$('generateBtn');btn.disabled=true;btn.textContent='Processando dados...';message('Processando...');await new Promise(r=>setTimeout(r,20));try{
- const text=$('input').value.trim();if(!text)return message('Cole os dados ou selecione um arquivo CSV/TXT.',true);
- const delimiter=detectDelimiter(text),matrix=parseDelimited(text,delimiter);if(matrix.length<2)return message('Cole o cabeçalho e pelo menos um registro.',true);
- const headers=matrix[0].map(norm);
- const I={r:ix(headers,'responsavel','responsável','nome responsavel'),pi:ix(headers,'pi','numero do pi','número do pi','nº pi','num pi','codigo pi','código pi'),v:ix(headers,'niveis de tensao','nivel de tensao','tensão'),c:ix(headers,'conjunto critico','conjunto crítico','conjunto crit','conjunto'),cp:ix(headers,'chi planejado','chi plan'),ce:ix(headers,'chi executado','chi exec'),fp:ix(headers,'comp. financ. planej','comp financ planej','compensacao planejada','compensação planejada'),fe:ix(headers,'comp. financ. execut','comp financ execut','compensacao executada','compensação executada'),di:ix(headers,'prev. inicio interrup','prev. inicio'),ri:ix(headers,'inicio da interrupcao','início da interrupção'),df:ix(headers,'prev. fim interrup','prev. fim'),rf:ix(headers,'termino da interrupcao','término da interrupção')};
- const required=[['PI',I.pi],['CHI Executado',I.ce],['Comp. Financ. Execut.',I.fe]].filter(x=>x[1]<0).map(x=>x[0]);if(required.length)return message('Cabeçalhos obrigatórios não encontrados: '+required.join(', '),true);
- const recommended=[['Responsável',I.r],['Tensão',I.v],['Conjunto crítico',I.c],['CHI Planejado',I.cp],['Compensação Planejada',I.fp],['Datas do período',Math.max(I.di,I.ri,I.df,I.rf)]].filter(x=>x[1]<0).map(x=>x[0]);
- rows=matrix.slice(1).map(c=>{const g=i=>i>=0?(c[i]||'').trim():'',cpRaw=g(I.cp),fpRaw=g(I.fp),cp=num(cpRaw),ce=num(g(I.ce)),fp=num(fpRaw),fe=num(g(I.fe));return{r:g(I.r)||'Não informado',pi:g(I.pi)||'—',v:(g(I.v)||'—').toUpperCase(),c:g(I.c)||'—',cp,cpInformado:isFilled(cpRaw),ce,cd:ce-cp,cv:pct(ce,cp),fp,fpInformado:isFilled(fpRaw),fe,fd:fe-fp,fv:pct(fe,fp),dates:[g(I.di),g(I.ri),g(I.df),g(I.rf)].filter(Boolean)}}).filter(r=>r.pi!=='—'||r.ce||r.fe);
- if(!rows.length)return message('Nenhum registro válido foi encontrado.',true);buildWeekOptions();render();const allDates=rows.flatMap(r=>r.dates),validDates=allDates.filter(v=>parseDate(v)).length,totalCHI=rows.reduce((a,r)=>a+r.ce,0),totalFIN=rows.reduce((a,r)=>a+r.fe,0);let info=`${rows.length} registros processados. CHI executado: ${nfmt(totalCHI)} | Compensação executada: ${money(totalFIN)}.`;if(allDates.length)info+=` Datas reconhecidas: ${validDates} de ${allDates.length}.`;if(recommended.length)info+=`\nAtenção: colunas recomendadas não identificadas: ${recommended.join(', ')}.`;message(info,recommended.length>0);
- }catch(e){console.error(e);message('Não foi possível processar os dados: '+e.message,true);}finally{btn.disabled=false;btn.textContent='Gerar Top 10';}}
-function startOfWeek(date){const d=new Date(date);d.setHours(0,0,0,0);const day=d.getDay();d.setDate(d.getDate()-(day===0?6:day-1));return d;}
-function weekKey(date){const d=startOfWeek(date);return d.toISOString().slice(0,10);}
-function formatWeek(key){const a=new Date(key+'T00:00:00'),b=new Date(a);b.setDate(a.getDate()+6);return `${a.toLocaleDateString('pt-BR')} a ${b.toLocaleDateString('pt-BR')}`;}
-function rowWeek(r){const dates=r.dates.map(parseDate).filter(Boolean).sort((a,b)=>a-b);return dates.length?weekKey(dates[0]):null;}
-function buildWeekOptions(){availableWeeks=[...new Set(rows.map(rowWeek).filter(Boolean))].sort().reverse();const select=$('weekSelect');select.innerHTML=availableWeeks.map(k=>`<option value="${k}">${formatWeek(k)}</option>`).join('')+'<option value="all">Todas as semanas</option>';activeWeek=availableWeeks[0]||'all';select.value=activeWeek;}
-function setWeek(value){activeWeek=value||'all';render();}
-const AREA_CONFIG={
- EXP:{label:'Gerência de Expansão',prefixes:['EXP-']},
- MAN_BX_OE:{label:'Gerência de Manutenção BX/OE',prefixes:['MAN-BX','MAN-OE']},
- MAN_LE_VP:{label:'Gerência de Manutenção LE/VP',prefixes:['MAN-LE','MAN-VP']},
- MAN_CS_SO:{label:'Gerência de Manutenção CS/SO',prefixes:['MAN-BA','MAN-CS']}
-};
-function areaRows(){const cfg=AREA_CONFIG[activeArea];return rows.filter(r=>{const responsible=norm(r.r);const areaOk=cfg.prefixes.some(prefix=>responsible.startsWith(norm(prefix)));const weekOk=activeWeek==='all'||rowWeek(r)===activeWeek;return areaOk&&weekOk;});}
-function setArea(area){activeArea=AREA_CONFIG[area]?area:'EXP';Object.keys(AREA_CONFIG).forEach(key=>{const btn=$('btn'+key);btn.classList.toggle('active',activeArea===key);btn.classList.toggle('primary',activeArea===key);});render();}
-function render(){
- const scope=areaRows(),label=AREA_CONFIG[activeArea].label,weekLabel=activeWeek==='all'?'Todas as semanas':formatWeek(activeWeek);
- $('committeeSwitch').style.display='block';$('committeeNote').textContent=`${scope.length} registro(s) | ${label} | Semana: ${weekLabel} | Prefixos: ${AREA_CONFIG[activeArea].prefixes.join(' e ')}.`;
- $('titleCHI').textContent='Visão executiva | CHI';$('titleFIN').textContent='Visão executiva | Compensação financeira';
- const positiveCHIAll=scope.filter(r=>r.cpInformado&&r.cd>0).sort((a,b)=>b.cd-a.cd||b.cv-a.cv);
- const positiveFINAll=scope.filter(r=>r.fe>0&&r.fd>0).sort((a,b)=>b.fd-a.fd||b.fe-a.fe);
- const sum=(data,k)=>data.reduce((a,r)=>a+(Number.isFinite(r[k])?r[k]:0),0),cp=sum(positiveCHIAll,'cp'),ce=sum(positiveCHIAll,'ce'),fp=sum(positiveFINAll,'fp'),fe=sum(positiveFINAll,'fe');
- const unplanned=positiveFINAll.filter(r=>!r.fpInformado),unplannedValue=unplanned.reduce((a,r)=>a+r.fe,0);
- const positiveCHI=positiveCHIAll.slice(0,10);
- const topFIN=positiveFINAll.slice(0,10);
- const positiveCount=positiveCHIAll.length,aboveFIN=positiveFINAll.length;
- const topCHI=Math.min(positiveCHIAll.length,10),topFINCount=Math.min(positiveFINAll.length,10);
- $('rankTitleCHI').textContent=`Top ${topCHI} | Variação positiva de CHI`;
- $('rankTitleFIN').textContent=`Top ${topFINCount} | Compensação financeira`;
- const positiveTotal=positiveCHI.reduce((a,r)=>a+r.cd,0),topFinShare=fe?topFIN.reduce((a,r)=>a+r.fe,0)/fe*100:0;
- const p=activeWeek==='all'?period(scope.flatMap(r=>r.dates)):`Semana: ${weekLabel}`,stamp='Gerado em '+new Date().toLocaleString('pt-BR');$('periodCHI').textContent=p;$('periodFIN').textContent=p;$('stampCHI').textContent=stamp;$('stampFIN').textContent=stamp;
- $('chiPlan').textContent=nfmt(cp);$('chiExec').textContent=nfmt(ce);$('chiExecSub').textContent=`Variação relativa: ${pf(pct(ce,cp))}`;const chiDelta=ce-cp;$('chiDelta').textContent=`${chiDelta>0?'+':''}${nfmt(chiDelta)}`;$('chiDeltaSub').textContent=chiDelta>0?'Executado acima do planejado':chiDelta<0?'Executado abaixo do planejado':'Executado igual ao planejado';setStatus('chiExecCard','chiStatus',cp===0&&ce>0?'warning':chiDelta>0?'danger':'success',cp===0&&ce>0?'NÃO PLANEJADO':chiDelta>0?'ACIMA DO PLANEJADO':'DENTRO DO PLANEJADO');$('chiDeltaCard').classList.remove('danger','success','warning');$('chiDeltaCard').classList.add(chiDelta>0?'danger':'success');
- $('chiMax').textContent=positiveCHI.length?`+${positiveCHI[0].cv.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}%`:'0,00%';$('chiMaxSub').textContent=positiveCHI.length?`PI ${positiveCHI[0].pi}`:'Sem variação positiva';
- $('summaryCHI').innerHTML=positiveCHI.length?`<b>Leitura gerencial | ${label}:</b> foram identificados <b>${positiveCount} PI(s)</b> com variação positiva de CHI. Entre os ${topCHI} maiores desvios, o acréscimo soma <b>${nfmt(positiveTotal)}</b>. O PI <b>${esc(positiveCHI[0].pi)}</b>, do responsável <b>${esc(positiveCHI[0].r)}</b>, lidera com <b>+${positiveCHI[0].cv.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}%</b>.`:`<b>Leitura gerencial | ${label}:</b> não há casos com variação positiva de CHI no período selecionado.`;
- $('finPlan').textContent=money(fp);$('finExec').textContent=money(fe);$('finExecSub').textContent=`Variação relativa: ${pf(pct(fe,fp))}`;setStatus('finExecCard','finStatus',fp===0&&fe>0?'warning':fe>fp?'danger':'success',fp===0&&fe>0?'NÃO PLANEJADO':fe>fp?'ACIMA DO PLANEJADO':'DENTRO DO PLANEJADO');$('finUnplanned').textContent=money(unplannedValue);$('finUnplannedSub').textContent=`${unplanned.length} PI(s) com planejamento vazio`;$('finMax').textContent=topFIN.length?money(topFIN[0].fe):money(0);$('finMaxSub').textContent=topFIN.length?`PI ${topFIN[0].pi}`:'Sem compensação executada';
- $('summaryFIN').innerHTML=topFIN.length?`<b>Leitura gerencial | ${label}:</b> o ranking apresenta exclusivamente os casos em que a compensação financeira executada excedeu a planejada. O Top ${topFINCount} concentra <b>${topFinShare.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}%</b> do valor da área, com <b>${aboveFIN} PI(s)</b> acima do planejado. O PI <b>${esc(topFIN[0].pi)}</b> lidera com <b>${money(topFIN[0].fe)}</b>.`:`<b>Leitura gerencial | ${label}:</b> não há casos com variação financeira positiva, ou seja, com valor executado maior que o planejado.`;
- rank('chiBody',positiveCHI,'chi');rank('finBody',topFIN,'fin');$('dashCHI').style.display='block';$('dashFIN').style.display='block';
-}
-function rank(id,data,type){if(!data.length){$(id).innerHTML='<tr class="empty-row"><td colspan="7">Não há variações positivas para compor o ranking.</td></tr>';return;}$(id).innerHTML=data.map((r,i)=>{const plan=type==='chi'?nfmt(r.cp):money(r.fp),exec=type==='chi'?nfmt(r.ce):money(r.fe),delta=type==='chi'?r.cd:r.fd,p=type==='chi'?r.cv:r.fv,dt=type==='chi'?`${delta>0?'+':''}${nfmt(delta)}`:moneyDelta(delta),voltage=norm(r.v)==='mt'?'mt':norm(r.v)==='bt'?'bt':'other';return `<tr><td><span class="rank">${i+1}</span></td><td><b>${esc(r.pi)}</b><div class="muted">${esc(r.r)}</div></td><td><span class="voltage ${voltage}">${esc(r.v)}</span></td><td title="${esc(r.c)}">${esc(r.c)}</td><td class="num">${plan}</td><td class="num"><b>${exec}</b></td><td class="num ${delta>0?'bad':delta<0?'good':''}">${dt}<div class="muted">${pf(p)}</div></td></tr>`}).join('');}
-function clearAll(){if(($('input').value.trim()||rows.length)&&!confirm('Deseja limpar os dados e os painéis gerados?'))return;$('input').value='';$('fileInput').value='';$('fileName').textContent='Nenhum arquivo selecionado';$('dashCHI').style.display='none';$('dashFIN').style.display='none';$('committeeSwitch').style.display='none';rows=[];message('');}
-$('fileInput').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{$('input').value=await file.text();$('fileName').textContent=file.name;message(`Arquivo ${file.name} carregado. Clique em Gerar Top 10.`);}catch(err){message('Não foi possível ler o arquivo selecionado.',true);}});
-async function exportPanel(captureId,filePrefix,button){if(!rows.length)return message('Gere os painéis primeiro.',true);if(typeof html2canvas!=='function')return message('Biblioteca de exportação não carregada. Verifique a conexão ou disponibilize html2canvas.min.js localmente.',true);const original=button?.textContent||'';if(button){button.textContent='Gerando PNG em alta qualidade...';button.disabled=true}document.body.classList.add('exporting');let stage;try{await document.fonts.ready;stage=document.createElement('section');stage.className='ppt-stage';stage.setAttribute('aria-hidden','true');const frame=document.createElement('div');frame.className='ppt-frame';const clone=$(captureId).cloneNode(true);clone.id='capture';frame.append(clone);stage.append(frame);document.body.append(stage);await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));const canvas=await html2canvas(stage,{backgroundColor:'#ffffff',scale:2,width:1888,height:900,windowWidth:1888,windowHeight:900,scrollX:0,scrollY:0,useCORS:true,logging:false,imageTimeout:15000,onclone:doc=>{doc.body.style.margin='0';doc.body.style.background='#fff'}});const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png',1));if(!blob)throw new Error('Falha ao criar o arquivo PNG.');const url=URL.createObjectURL(blob),a=document.createElement('a');a.download=`${filePrefix}_${new Date().toISOString().slice(0,10)}.png`;a.href=url;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);message(`PNG gerado em ${canvas.width} x ${canvas.height} px.`);}catch(error){console.error(error);message('Não foi possível gerar o PNG: '+error.message,true);}finally{stage?.remove();document.body.classList.remove('exporting');if(button){button.disabled=false;button.textContent=original}}}
-function pngCHI(){exportPanel('captureCHI',`Comite_${activeArea}_${activeWeek}_Variacao_Positiva_CHI`,document.querySelector('button[onclick="pngCHI()"]'));}
-function pngFIN(){exportPanel('captureFIN',`Comite_${activeArea}_${activeWeek}_Compensacao_Financeira`,document.querySelector('button[onclick="pngFIN()"]'));}
+(()=>{const KEY='mic_equipamento_simplificado_v1',$=id=>document.getElementById(id);let dados=JSON.parse(localStorage.getItem(KEY)||'[]');const dataHoje=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};$('data').value=dataHoje();const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function persist(){localStorage.setItem(KEY,JSON.stringify(dados))}function aviso(t,c='ok'){$('msg').textContent=t;$('msg').className='msg '+c;setTimeout(()=>$('msg').className='msg',3000)}function limpar(){$('form').reset();$('editId').value='';$('data').value=dataHoje()}function render(){const q=$('busca').value.toLowerCase().trim(),lista=dados.filter(x=>Object.values(x).join(' ').toLowerCase().includes(q));$('tabela').innerHTML=lista.length?lista.map(x=>`<tr><td><span class="badge">${esc(x.mic)}</span></td><td>${esc(x.data.split('-').reverse().join('/'))}</td><td>${esc(x.intervencao)}</td><td>${esc(x.tipo)}</td><td>${esc(x.numero)}</td><td class="acoes"><button class="secondary" data-edit="${x.id}" type="button">Editar</button> <button class="danger" data-del="${x.id}" type="button">Excluir</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">Nenhum registro encontrado.</td></tr>'}$('form').addEventListener('submit',e=>{e.preventDefault();const item={id:$('editId').value||String(Date.now()),mic:$('mic').value.trim(),data:$('data').value,intervencao:$('intervencao').value,tipo:$('tipo').value,numero:$('numero').value.trim()};if(Object.values(item).some(v=>!v)){aviso('Preencha todos os campos.','erro');return}const i=dados.findIndex(x=>x.id===item.id);if(i>=0)dados[i]=item;else dados.unshift(item);persist();render();limpar();aviso(i>=0?'Registro atualizado.':'Registro salvo.')} );$('tabela').addEventListener('click',e=>{const id=e.target.dataset.edit||e.target.dataset.del;if(!id)return;const x=dados.find(r=>r.id===id);if(e.target.dataset.del){if(confirm('Excluir este registro?')){dados=dados.filter(r=>r.id!==id);persist();render()}}else{['mic','data','intervencao','tipo','numero'].forEach(c=>$(c).value=x[c]);$('editId').value=x.id;scrollTo({top:0,behavior:'smooth'})}});$('limpar').addEventListener('click',limpar);$('busca').addEventListener('input',render);$('apagar').addEventListener('click',()=>{if(dados.length&&confirm('Apagar todos os registros?')){dados=[];persist();render()}});$('csv').addEventListener('click',()=>{if(!dados.length){aviso('Não há registros para exportar.','erro');return}const linhas=[['MIC','Data','Tipo de intervenção','Tipo do equipamento','Número do equipamento'],...dados.map(x=>[x.mic,x.data,x.intervencao,x.tipo,x.numero])];const csv=linhas.map(l=>l.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');const b=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='registros_MIC.csv';a.click();URL.revokeObjectURL(a.href)});render()})();
 </script>
-</body>
-</html>
+</body></html>
